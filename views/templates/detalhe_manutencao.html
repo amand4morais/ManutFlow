@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Detalhes da Manutenção - Sistema de Manutenção{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-wrench"></i> Detalhes da Manutenção
+        </h1>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('manutencao.editar_manutencao', manutencao_id=manutencao.id) }}" 
+           class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a href="{{ url_for('manutencao.listar_manutencoes') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações da Manutenção</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Data:</th>
+                        <td>{{ manutencao.data_manutencao.strftime('%d/%m/%Y') if manutencao.data_manutencao else '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tipo:</th>
+                        <td>
+                            <span class="badge bg-{{ manutencao.get_tipo_color() }}">
+                                {{ manutencao.get_tipo_label() }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Custo:</th>
+                        <td><strong>R$ {{ "%.2f"|format(manutencao.custo) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Registrado em:</th>
+                        <td>{{ manutencao.data_registro.strftime('%d/%m/%Y %H:%M') if manutencao.data_registro else '-' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-gear"></i> Equipamento</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <th width="40%">Código:</th>
+                        <td><strong>{{ manutencao.equipamento.codigo }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Nome:</th>
+                        <td>{{ manutencao.equipamento.nome }}</td>
+                    </tr>
+                    <tr>
+                        <th>Setor:</th>
+                        <td>{{ manutencao.equipamento.setor }}</td>
+                    </tr>
+                    <tr>
+                        <th>Responsável:</th>
+                        <td>{{ manutencao.equipamento.responsavel }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status:</th>
+                        <td>
+                            <span class="badge bg-{{ manutencao.equipamento.get_status_color() }}">
+                                {{ manutencao.equipamento.get_status_label() }}
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=manutencao.equipamento.id) }}" 
+                   class="btn btn-sm btn-info">
+                    <i class="bi bi-eye"></i> Ver Equipamento
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-file-text"></i> Descrição</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text" style="white-space: pre-wrap;">{{ manutencao.descricao }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

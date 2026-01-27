@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{% if equipamento %}Editar{% else %}Novo{% endif %} Equipamento - Sistema de Manutenção{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-{% if equipamento %}pencil{% else %}plus-circle{% endif %}"></i> 
+            {% if equipamento %}Editar{% else %}Novo{% endif %} Equipamento
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome do Equipamento *</label>
+                        <input type="text" class="form-control" id="nome" name="nome" 
+                               value="{% if equipamento %}{{ equipamento.nome }}{% endif %}" 
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="codigo" class="form-label">Código *</label>
+                        <input type="text" class="form-control" id="codigo" name="codigo" 
+                               value="{% if equipamento %}{{ equipamento.codigo }}{% endif %}" 
+                               required>
+                        <div class="form-text">Código único de identificação do equipamento</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="setor" class="form-label">Setor *</label>
+                        <input type="text" class="form-control" id="setor" name="setor" 
+                               value="{% if equipamento %}{{ equipamento.setor }}{% endif %}" 
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="responsavel" class="form-label">Responsável *</label>
+                        <input type="text" class="form-control" id="responsavel" name="responsavel" 
+                               value="{% if equipamento %}{{ equipamento.responsavel }}{% endif %}" 
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status *</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="ativo" {% if equipamento and equipamento.status == 'ativo' %}selected{% endif %}>
+                                Ativo
+                            </option>
+                            <option value="em_manutencao" {% if equipamento and equipamento.status == 'em_manutencao' %}selected{% endif %}>
+                                Em Manutenção
+                            </option>
+                            <option value="sucateado" {% if equipamento and equipamento.status == 'sucateado' %}selected{% endif %}>
+                                Sucateado
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> {% if equipamento %}Atualizar{% else %}Cadastrar{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-info-circle"></i> Informações
+                </h5>
+                <p class="card-text">
+                    Preencha todos os campos obrigatórios (*) para {% if equipamento %}atualizar{% else %}cadastrar{% endif %} o equipamento.
+                </p>
+                <hr>
+                <h6>Status:</h6>
+                <ul class="small">
+                    <li><strong>Ativo:</strong> Equipamento em operação normal</li>
+                    <li><strong>Em Manutenção:</strong> Equipamento em processo de manutenção</li>
+                    <li><strong>Sucateado:</strong> Equipamento fora de operação</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

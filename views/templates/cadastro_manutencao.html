@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}{% if manutencao %}Editar{% else %}Nova{% endif %} Manutenção - Sistema de Manutenção{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-{% if manutencao %}pencil{% else %}plus-circle{% endif %}"></i> 
+            {% if manutencao %}Editar{% else %}Nova{% endif %} Manutenção
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="equipamento_id" class="form-label">Equipamento *</label>
+                        <select class="form-select" id="equipamento_id" name="equipamento_id" required>
+                            <option value="">Selecione um equipamento</option>
+                            {% for eq in equipamentos %}
+                            <option value="{{ eq.id }}" 
+                                    {% if manutencao and manutencao.equipamento_id == eq.id %}selected{% endif %}>
+                                {{ eq.codigo }} - {{ eq.nome }} ({{ eq.setor }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tipo" class="form-label">Tipo de Manutenção *</label>
+                        <select class="form-select" id="tipo" name="tipo" required>
+                            <option value="preventiva" {% if manutencao and manutencao.tipo == 'preventiva' %}selected{% endif %}>
+                                Preventiva
+                            </option>
+                            <option value="corretiva" {% if manutencao and manutencao.tipo == 'corretiva' %}selected{% endif %}>
+                                Corretiva
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="data_manutencao" class="form-label">Data da Manutenção *</label>
+                        <input type="date" class="form-control" id="data_manutencao" name="data_manutencao" 
+                               value="{% if manutencao %}{{ manutencao.data_manutencao.strftime('%Y-%m-%d') }}{% endif %}" 
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição *</label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="5" required>{% if manutencao %}{{ manutencao.descricao }}{% endif %}</textarea>
+                        <div class="form-text">Descreva detalhadamente o serviço realizado</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="custo" class="form-label">Custo (R$)</label>
+                        <input type="number" class="form-control" id="custo" name="custo" 
+                               step="0.01" min="0" 
+                               value="{% if manutencao %}{{ manutencao.custo }}{% else %}0{% endif %}">
+                        <div class="form-text">Valor total gasto com a manutenção</div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('manutencao.listar_manutencoes') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> {% if manutencao %}Atualizar{% else %}Registrar{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-info-circle"></i> Informações
+                </h5>
+                <p class="card-text">
+                    Preencha todos os campos obrigatórios (*) para {% if manutencao %}atualizar{% else %}registrar{% endif %} a manutenção.
+                </p>
+                <hr>
+                <h6>Tipos de Manutenção:</h6>
+                <ul class="small">
+                    <li><strong>Preventiva:</strong> Manutenção planejada para prevenir falhas</li>
+                    <li><strong>Corretiva:</strong> Manutenção para corrigir falhas já ocorridas</li>
+                </ul>
+                <hr>
+                <p class="small text-muted">
+                    <i class="bi bi-lightbulb"></i> Dica: Registre manutenções preventivas regularmente para reduzir custos com manutenções corretivas.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

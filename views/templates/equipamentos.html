@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Equipamentos - Sistema de Manutenção{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-gear"></i> Equipamentos
+        </h1>
+        <p class="lead">Gerenciamento de equipamentos</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle"></i> Novo Equipamento
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if equipamentos %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="tabelaEquipamentos">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Setor</th>
+                            <th>Responsável</th>
+                            <th>Status</th>
+                            <th>Manutenções</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eq in equipamentos %}
+                        <tr>
+                            <td><strong>{{ eq.codigo }}</strong></td>
+                            <td>{{ eq.nome }}</td>
+                            <td>{{ eq.setor }}</td>
+                            <td>{{ eq.responsavel }}</td>
+                            <td>
+                                <span class="badge bg-{{ eq.get_status_color() }}">
+                                    {{ eq.get_status_label() }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    {{ eq.manutencoes|length }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=eq.id) }}" 
+                                       class="btn btn-sm btn-info" title="Ver detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('equipamento.editar_equipamento', equipamento_id=eq.id) }}" 
+                                       class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" 
+                                            onclick="confirmarDelecao({{ eq.id }}, '{{ eq.codigo }}')" 
+                                            title="Deletar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Nenhum equipamento cadastrado ainda.
+                <a href="{{ url_for('equipamento.novo_equipamento') }}" class="alert-link">Cadastrar primeiro equipamento</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Deleção -->
+<div class="modal fade" id="modalDelecao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar Deleção</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja deletar o equipamento <strong id="equipamentoCodigo"></strong>?</p>
+                <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> Esta ação não pode ser desfeita e todas as manutenções associadas serão deletadas!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formDelecao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Deletar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmarDelecao(equipamentoId, codigo) {
+    document.getElementById('equipamentoCodigo').textContent = codigo;
+    document.getElementById('formDelecao').action = `/equipamentos/${equipamentoId}/deletar`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalDelecao'));
+    modal.show();
+}
+</script>
+{% endblock %}
