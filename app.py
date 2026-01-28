@@ -1,10 +1,18 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
+from flask_login import LoginManager
 from models.database import db, init_db
+
+# IMPORTE TODOS OS MODELOS AQUI PARA O SQLALCHEMY CRIAR AS TABELAS
 from models.equipamento import Equipamento
 from models.manutencao import Manutencao
+from models.setor import Setor
+from models.funcionario import Funcionario
+
 from controllers.equipamento_controller import equipamento_bp
 from controllers.manutencao_controller import manutencao_bp
 from controllers.ia_controller import ia_bp
+from controllers.setor_controller import setor_bp
+
 import config
 from dotenv import load_dotenv
 import os
@@ -20,6 +28,15 @@ app = Flask(__name__,
 # Carrega configurações
 app.config.from_object(config)
 
+# Configuração do Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login' # Rota de login futura
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Funcionario.query.get(int(user_id))
+
 # Inicializa o banco de dados
 init_db(app)
 
@@ -27,6 +44,7 @@ init_db(app)
 app.register_blueprint(equipamento_bp)
 app.register_blueprint(manutencao_bp)
 app.register_blueprint(ia_bp)
+app.register_blueprint(setor_bp)
 
 # Rota principal (Dashboard)
 @app.route('/')
@@ -50,57 +68,24 @@ def index():
                          equipamentos_em_manutencao=equipamentos_em_manutencao,
                          total_manutencoes=total_manutencoes)
 
-# Rota de teste
-@app.route('/teste')
-def teste():
-    """
-    Rota de teste para verificar se o sistema está funcionando
-    """
-    return {
-        'status': 'ok',
-        'mensagem': 'Sistema de Manutenção funcionando corretamente!',
-        'versao': '1.0.0'
-    }
-
 # Tratamento de erros
 @app.errorhandler(404)
 def page_not_found(e):
-    """
-    Página de erro 404
-    """
     return render_template('base.html'), 404
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    """
-    Página de erro 500
-    """
     return render_template('base.html'), 500
 
-# Contexto do template - variáveis globais disponíveis em todos os templates
+# Contexto do template
 @app.context_processor
 def utility_processor():
-    """
-    Adiciona funções utilitárias aos templates
-    """
     def format_currency(value):
-        """Formata valor como moeda brasileira"""
         return f"R$ {value:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-    
     return dict(format_currency=format_currency)
 
-# Ponto de entrada da aplicação
 if __name__ == '__main__':
     print("=" * 60)
-    print("Sistema de Controle de Manutenção de Equipamentos")
+    print("Sistema ManutFlow - Atualizado com Controle de Acesso")
     print("=" * 60)
-    print("Iniciando servidor...")
-    print("Acesse: http://localhost:5000")
-    print("=" * 60)
-    
-    # Executa a aplicação
-    app.run(
-        host='0.0.0.0',
-        port=5000,
-        debug=True
-    )
+    app.run(host='0.0.0.0', port=5000, debug=True)

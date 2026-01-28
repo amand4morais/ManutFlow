@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, jsonify, current_app
+from flask import Blueprint, render_template, jsonify, current_app, redirect, url_for, flash
+from flask_login import current_user, login_required
 from models.equipamento import Equipamento
 from models.manutencao import Manutencao
 from models.database import db
@@ -55,7 +56,7 @@ def preparar_dados_para_ia():
         equipamentos_detalhes.append({
             'codigo': eq.codigo,
             'nome': eq.nome,
-            'setor': eq.setor,
+            'setor': eq.setor_rel.nome if eq.setor_rel else "N/A",
             'status': eq.status,
             'total_manutencoes': len(manutencoes_eq),
             'manutencoes_preventivas': len([m for m in manutencoes_eq if m.tipo == 'preventiva']),
@@ -66,10 +67,10 @@ def preparar_dados_para_ia():
     # Análise por setor
     setores_stats = defaultdict(lambda: {'total_equipamentos': 0, 'custo_total': 0, 'total_manutencoes': 0})
     for eq in equipamentos:
-        setor = eq.setor
-        setores_stats[setor]['total_equipamentos'] += 1
-        setores_stats[setor]['custo_total'] += Manutencao.get_custo_por_equipamento(eq.id)
-        setores_stats[setor]['total_manutencoes'] += len(Manutencao.get_by_equipamento(eq.id))
+        setor_nome = eq.setor_rel.nome if eq.setor_rel else "N/A"
+        setores_stats[setor_nome]['total_equipamentos'] += 1
+        setores_stats[setor_nome]['custo_total'] += Manutencao.get_custo_por_equipamento(eq.id)
+        setores_stats[setor_nome]['total_manutencoes'] += len(Manutencao.get_by_equipamento(eq.id))
     
     # Manutenções recentes (últimos 30 dias)
     data_limite = datetime.now().date() - timedelta(days=30)
@@ -163,10 +164,15 @@ IMPORTANTE: Responda EXCLUSIVAMENTE em formato JSON puro, sem explicações fora
         }
 
 @ia_bp.route('/ia/dashboard')
+@login_required
 def dashboard_ia():
     """
-    Exibe o dashboard com análises da IA
+    Exibe o dashboard com análises da IA - APENAS PARA ADMINS
     """
+    if not hasattr(current_user, 'is_admin') or not current_user.is_admin:
+        flash("Acesso negado! Apenas administradores podem ver as análises avançadas de IA.", "danger")
+        return redirect(url_for('index'))
+        
     dados = preparar_dados_para_ia()
     analise = gerar_analise_ia(dados)
     
@@ -175,10 +181,14 @@ def dashboard_ia():
                          analise=analise)
 
 @ia_bp.route('/api/ia/analise')
+@login_required
 def api_analise_ia():
     """
     API: Retorna análise da IA em JSON
     """
+    if not hasattr(current_user, 'is_admin') or not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+        
     dados = preparar_dados_para_ia()
     analise = gerar_analise_ia(dados)
     
@@ -188,9 +198,13 @@ def api_analise_ia():
     })
 
 @ia_bp.route('/api/ia/dados')
+@login_required
 def api_dados_ia():
     """
     API: Retorna apenas os dados preparados para IA
     """
+    if not hasattr(current_user, 'is_admin') or not current_user.is_admin:
+        return jsonify({'error': 'Unauthorized'}), 403
+        
     dados = preparar_dados_para_ia()
     return jsonify(dados)

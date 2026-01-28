@@ -3,3 +3,4 @@ Flask-SQLAlchemy>=3.1.0
 SQLAlchemy>=2.0.30
 groq>=0.15.0
 python-dotenv>=1.0.0
+flask-login>=0.6.3

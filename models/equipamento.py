@@ -10,8 +10,11 @@ class Equipamento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(200), nullable=False)
     codigo = db.Column(db.String(50), unique=True, nullable=False)
-    setor = db.Column(db.String(100), nullable=False)
-    responsavel = db.Column(db.String(100), nullable=False)
+    
+    # NOVAS CHAVES ESTRANGEIRAS
+    setor_id = db.Column(db.Integer, db.ForeignKey('setores.id'), nullable=False)
+    responsavel_id = db.Column(db.Integer, db.ForeignKey('funcionarios.id'), nullable=False)
+    
     status = db.Column(db.String(20), nullable=False, default='ativo')
     # Status possíveis: 'ativo', 'em_manutencao', 'sucateado'
     
@@ -32,8 +35,8 @@ class Equipamento(db.Model):
             'id': self.id,
             'nome': self.nome,
             'codigo': self.codigo,
-            'setor': self.setor,
-            'responsavel': self.responsavel,
+            'setor': self.setor_rel.nome if self.setor_rel else "N/A",
+            'responsavel': self.responsavel_rel.nome if self.responsavel_rel else "N/A",
             'status': self.status,
             'data_cadastro': self.data_cadastro.strftime('%Y-%m-%d %H:%M:%S') if self.data_cadastro else None,
             'data_atualizacao': self.data_atualizacao.strftime('%Y-%m-%d %H:%M:%S') if self.data_atualizacao else None,
