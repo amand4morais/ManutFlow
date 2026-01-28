@@ -10,10 +10,39 @@ manutencao_bp = Blueprint('manutencao', __name__)
 @manutencao_bp.route('/manutencoes')
 def listar_manutencoes():
     """
-    Lista todas as manutenções
+    Lista manutenções com filtro de data
     """
-    manutencoes = Manutencao.get_all()
-    return render_template('manutencoes.html', manutencoes=manutencoes)
+    data_inicio_str = request.args.get('data_inicio')
+    data_fim_str = request.args.get('data_fim')
+    filtro_pre = request.args.get('filtro_pre', '')
+    
+    data_inicio = None
+    data_fim = None
+    
+    # Processa as datas se fornecidas
+    if data_inicio_str:
+        try:
+            data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+            
+    if data_fim_str:
+        try:
+            data_fim = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+    
+    # Busca com filtro ou busca tudo
+    if data_inicio or data_fim:
+        manutencoes = Manutencao.get_filtered(data_inicio, data_fim)
+    else:
+        manutencoes = Manutencao.get_all()
+        
+    return render_template('manutencoes.html', 
+                         manutencoes=manutencoes,
+                         data_inicio=data_inicio_str,
+                         data_fim=data_fim_str,
+                         filtro_pre=filtro_pre)
 
 @manutencao_bp.route('/manutencoes/nova', methods=['GET', 'POST'])
 def nova_manutencao():

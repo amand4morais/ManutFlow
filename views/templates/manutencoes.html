@@ -17,6 +17,45 @@
     </div>
 </div>
 
+<!-- Filtros de Data -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <i class="bi bi-funnel"></i> Filtros de Período
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('manutencao.listar_manutencoes') }}" id="formFiltro" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="filtro_pre" class="form-label">Período Pré-definido</label>
+                <select class="form-select" id="filtro_pre" name="filtro_pre" onchange="aplicarPredefinicao(this.value)">
+                    <option value="" {% if not filtro_pre %}selected{% endif %}>Personalizado</option>
+                    <option value="mes_atual" {% if filtro_pre == 'mes_atual' %}selected{% endif %}>Mês Atual</option>
+                    <option value="ultimos_3_meses" {% if filtro_pre == 'ultimos_3_meses' %}selected{% endif %}>Últimos 3 Meses</option>
+                    <option value="ano_atual" {% if filtro_pre == 'ano_atual' %}selected{% endif %}>Ano Atual</option>
+                    <option value="ano_passado" {% if filtro_pre == 'ano_passado' %}selected{% endif %}>Ano Passado</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="data_inicio" class="form-label">Data Início</label>
+                <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ data_inicio or '' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="data_fim" class="form-label">Data Fim</label>
+                <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ data_fim or '' }}">
+            </div>
+            <div class="col-md-3">
+                <div class="d-grid gap-2 d-md-flex">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-search"></i> Filtrar
+                    </button>
+                    <a href="{{ url_for('manutencao.listar_manutencoes') }}" class="btn btn-outline-secondary" title="Limpar Filtros">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         {% if manutencoes %}

@@ -171,6 +171,13 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
+function atualizarAno() {
+    const ano = new Date().getFullYear();
+    document.getElementById("ano-atual").textContent = ano;
+  }
+  
+  atualizarAno();  
+
 // Exporta funções para uso global
 window.formatCurrency = formatCurrency;
 window.formatDate = formatDate;

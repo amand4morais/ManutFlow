@@ -87,6 +87,21 @@ class Manutencao(db.Model):
         return Manutencao.query.filter_by(tipo=tipo).order_by(Manutencao.data_manutencao.desc()).all()
     
     @staticmethod
+    def get_filtered(data_inicio=None, data_fim=None):
+        """
+        Retorna manutenções filtradas por período
+        """
+        query = Manutencao.query
+        
+        if data_inicio:
+            query = query.filter(Manutencao.data_manutencao >= data_inicio)
+        
+        if data_fim:
+            query = query.filter(Manutencao.data_manutencao <= data_fim)
+            
+        return query.order_by(Manutencao.data_manutencao.desc()).all()
+
+    @staticmethod
     def get_custo_total():
         """
         Retorna o custo total de todas as manutenções
