@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Análise IA - Sistema de Manutenção{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-cpu"></i> Análise Inteligente
+        </h1>
+        <p class="lead">Insights e recomendações geradas por IA</p>
+    </div>
+    <div class="col-auto">
+        <button onclick="location.reload()" class="btn btn-primary">
+            <i class="bi bi-arrow-clockwise"></i> Atualizar Análise
+        </button>
+    </div>
+</div>
+
+<!-- Estatísticas Gerais -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h6 class="card-title">Total de Equipamentos</h6>
+                <h2 class="card-text">{{ dados.estatisticas_gerais.total_equipamentos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h6 class="card-title">Equipamentos Ativos</h6>
+                <h2 class="card-text">{{ dados.estatisticas_gerais.equipamentos_ativos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h6 class="card-title">Em Manutenção</h6>
+                <h2 class="card-text">{{ dados.estatisticas_gerais.equipamentos_em_manutencao }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h6 class="card-title">Custo Total</h6>
+                <h2 class="card-text">R$ {{ "%.2f"|format(dados.estatisticas_gerais.custo_total) }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumo da Saúde -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-heart-pulse"></i> Resumo da Saúde dos Equipamentos
+        </h5>
+    </div>
+    <div class="card-body">
+        <p class="card-text" style="white-space: pre-wrap;">{{ analise.resumo_saude }}</p>
+    </div>
+</div>
+
+<!-- Equipamentos Críticos -->
+<div class="card mb-4">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-exclamation-triangle"></i> Equipamentos Críticos (Prioridades)
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if analise.equipamentos_criticos %}
+            <div class="list-group">
+                {% for eq in analise.equipamentos_criticos %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">
+                            <strong>{{ eq.codigo }}</strong> - {{ eq.nome }}
+                        </h6>
+                        <span class="badge bg-{% if eq.prioridade == 'alta' %}danger{% elif eq.prioridade == 'média' %}warning{% else %}info{% endif %}">
+                            Prioridade {{ eq.prioridade|capitalize }}
+                        </span>
+                    </div>
+                    <p class="mb-1">{{ eq.justificativa }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Nenhum equipamento crítico identificado no momento.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Análise por Setor -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-building"></i> Análise por Setor
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if analise.analise_setores %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Setor</th>
+                            <th>Custo Total</th>
+                            <th>Recomendação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for setor in analise.analise_setores %}
+                        <tr>
+                            <td><strong>{{ setor.setor }}</strong></td>
+                            <td>R$ {{ "%.2f"|format(setor.custo_total) }}</td>
+                            <td>{{ setor.recomendacao }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Análise por setor não disponível.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recomendações Estratégicas -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-lightbulb"></i> Recomendações Estratégicas
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if analise.recomendacoes %}
+            <ul class="list-group list-group-flush">
+                {% for rec in analise.recomendacoes %}
+                <li class="list-group-item">
+                    <i class="bi bi-check-circle text-success"></i> {{ rec }}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Nenhuma recomendação disponível no momento.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Gráficos de Estatísticas -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Manutenções por Tipo</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoTipos"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Status dos Equipamentos</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoStatus"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Gráfico de Manutenções por Tipo
+const ctxTipos = document.getElementById('graficoTipos').getContext('2d');
+new Chart(ctxTipos, {
+    type: 'pie',
+    data: {
+        labels: ['Preventivas', 'Corretivas'],
+        datasets: [{
+            data: [
+                {{ dados.estatisticas_gerais.manutencoes_preventivas }},
+                {{ dados.estatisticas_gerais.manutencoes_corretivas }}
+            ],
+            backgroundColor: ['#17a2b8', '#ffc107']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Gráfico de Status dos Equipamentos
+const ctxStatus = document.getElementById('graficoStatus').getContext('2d');
+new Chart(ctxStatus, {
+    type: 'doughnut',
+    data: {
+        labels: ['Ativos', 'Em Manutenção', 'Sucateados'],
+        datasets: [{
+            data: [
+                {{ dados.estatisticas_gerais.equipamentos_ativos }},
+                {{ dados.estatisticas_gerais.equipamentos_em_manutencao }},
+                {{ dados.estatisticas_gerais.equipamentos_sucateados }}
+            ],
+            backgroundColor: ['#28a745', '#dc3545', '#6c757d']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

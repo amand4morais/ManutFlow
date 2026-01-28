@@ -1,0 +1,54 @@
+================================================================================
+GUIA DE INSTALAÇÃO - SISTEMA DE MANUTENÇÃO (VERSÃO GROQ)
+================================================================================
+
+Este sistema foi atualizado para usar a API do Groq, que é gratuita e muito
+mais rápida que a OpenAI. Siga os passos abaixo para configurar tudo:
+
+PASSO 1: OBTER SUA CHAVE API (GRATUITO)
+================================================================================
+1. Acesse o site: https://console.groq.com/
+2. Faça login (pode usar sua conta Google).
+3. No menu lateral, clique em "API Keys".
+4. Clique em "Create API Key", dê um nome e COPIE a chave gerada.
+
+PASSO 2: INSTALAÇÃO DO SISTEMA
+================================================================================
+1. Extraia o arquivo .zip para uma pasta.
+2. Abra o terminal ou prompt de comando nessa pasta.
+3. Instale os componentes necessários digitando:
+   
+   pip install -r requirements.txt
+
+PASSO 3: CONFIGURAR A CHAVE NO SISTEMA (.env)
+================================================================================
+A chave NÃO deve ser escrita dentro do código. Para facilitar, use o arquivo .env:
+
+1. Na pasta do projeto, você verá um arquivo chamado ".env.example".
+2. Renomeie esse arquivo para apenas ".env".
+3. Abra o arquivo ".env" com o Bloco de Notas.
+4. Na linha "GROQ_API_KEY=", cole sua chave logo após o sinal de igual.
+5. Salve o arquivo.
+
+O sistema lerá automaticamente sua chave desse arquivo ao iniciar!
+
+PASSO 4: EXECUTAR
+================================================================================
+1. Com a chave configurada, digite:
+   
+   python app.py
+
+2. Abra seu navegador e acesse:
+   
+   http://localhost:5000
+
+================================================================================
+POR QUE USAR O GROQ?
+================================================================================
+- Velocidade: É a IA mais rápida do mercado atualmente.
+- Custo: Possui um plano gratuito muito generoso (Free Tier).
+- Qualidade: Utiliza os modelos Llama 3 da Meta, que são excelentes.
+
+DÚVIDAS?
+Consulte o arquivo README.md para mais detalhes técnicos.
+================================================================================

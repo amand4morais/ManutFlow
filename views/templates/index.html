@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sistema de Manutenção{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </h1>
+        <p class="lead">Visão geral do sistema de manutenção</p>
+    </div>
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-gear-fill"></i> Total de Equipamentos
+                </h5>
+                <h2 class="card-text">{{ total_equipamentos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-check-circle-fill"></i> Equipamentos Ativos
+                </h5>
+                <h2 class="card-text">{{ equipamentos_ativos }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Em Manutenção
+                </h5>
+                <h2 class="card-text">{{ equipamentos_em_manutencao }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-wrench"></i> Total de Manutenções
+                </h5>
+                <h2 class="card-text">{{ total_manutencoes }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status dos Equipamentos -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-check"></i> Status dos Equipamentos
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if equipamentos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nome</th>
+                                    <th>Setor</th>
+                                    <th>Responsável</th>
+                                    <th>Status</th>
+                                    <th>Manutenções</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for eq in equipamentos %}
+                                <tr class="status-{{ eq.status }}">
+                                    <td><strong>{{ eq.codigo }}</strong></td>
+                                    <td>{{ eq.nome }}</td>
+                                    <td>{{ eq.setor }}</td>
+                                    <td>{{ eq.responsavel }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ eq.get_status_color() }}">
+                                            {{ eq.get_status_label() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {{ eq.manutencoes|length }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=eq.id) }}" 
+                                           class="btn btn-sm btn-info" title="Ver detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Nenhum equipamento cadastrado ainda.
+                        <a href="{{ url_for('equipamento.novo_equipamento') }}" class="alert-link">Cadastrar primeiro equipamento</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações Rápidas -->
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-plus-circle display-4 text-primary"></i>
+                <h5 class="card-title mt-3">Novo Equipamento</h5>
+                <p class="card-text">Cadastre um novo equipamento no sistema</p>
+                <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Cadastrar
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-plus display-4 text-success"></i>
+                <h5 class="card-title mt-3">Nova Manutenção</h5>
+                <p class="card-text">Registre uma nova manutenção</p>
+                <a href="{{ url_for('manutencao.nova_manutencao') }}" class="btn btn-success">
+                    <i class="bi bi-plus"></i> Registrar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Legenda de Cores -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Legenda de Status:</h6>
+                <div class="d-flex gap-3 flex-wrap">
+                    <div>
+                        <span class="badge bg-success">Verde</span> - Equipamento Ativo/OK
+                    </div>
+                    <div>
+                        <span class="badge bg-danger">Vermelho</span> - Em Manutenção
+                    </div>
+                    <div>
+                        <span class="badge bg-secondary">Cinza</span> - Sucateado
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
