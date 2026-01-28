@@ -8,6 +8,15 @@ def init_db(app):
     """
     Inicializa o banco de dados com a aplicação Flask
     """
+    import os
+    from pathlib import Path
+    
+    # Garante que a pasta 'data' existe para o SQLite
+    data_dir = Path(app.root_path) / 'data'
+    if not data_dir.exists():
+        os.makedirs(data_dir)
+        print(f"Pasta de dados criada em: {data_dir}")
+
     db.init_app(app)
     
     with app.app_context():
