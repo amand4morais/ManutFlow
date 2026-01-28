@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, current_app
+from flask import Blueprint, render_template, jsonify, current_app, request
 from models.equipamento import Equipamento
 from models.manutencao import Manutencao
 from models.database import db
@@ -27,14 +27,20 @@ def get_groq_client():
             client = Groq(api_key=api_key)
     return client
 
-def preparar_dados_para_ia():
+def preparar_dados_para_ia(data_inicio=None, data_fim=None):
     """
     Prepara os dados de equipamentos e manutenções para análise da IA
+    Com suporte a filtragem por período
     """
     equipamentos = Equipamento.get_all()
-    manutencoes = Manutencao.get_all()
     
-    # Estatísticas gerais
+    # Busca manutenções filtradas ou totais
+    if data_inicio or data_fim:
+        manutencoes = Manutencao.get_filtered(data_inicio, data_fim)
+    else:
+        manutencoes = Manutencao.get_all()
+    
+    # Estatísticas gerais baseadas na lista filtrada
     total_equipamentos = len(equipamentos)
     equipamentos_ativos = len([e for e in equipamentos if e.status == 'ativo'])
     equipamentos_em_manutencao = len([e for e in equipamentos if e.status == 'em_manutencao'])
@@ -44,14 +50,27 @@ def preparar_dados_para_ia():
     manutencoes_preventivas = len([m for m in manutencoes if m.tipo == 'preventiva'])
     manutencoes_corretivas = len([m for m in manutencoes if m.tipo == 'corretiva'])
     
-    custo_total = Manutencao.get_custo_total()
+    # Custo total baseado na lista filtrada
+    custo_total = sum(m.custo for m in manutencoes)
     
-    # Análise por equipamento
+    # Análise detalhada (precisa filtrar por equipamento respeitando as datas)
     equipamentos_detalhes = []
+    setores_stats = defaultdict(lambda: {'total_equipamentos': 0, 'custo_total': 0, 'total_manutencoes': 0})
+    
     for eq in equipamentos:
-        manutencoes_eq = Manutencao.get_by_equipamento(eq.id)
-        custo_eq = Manutencao.get_custo_por_equipamento(eq.id)
+        # Busca manutenções do equipamento
+        manutencoes_eq_total = Manutencao.get_by_equipamento(eq.id)
         
+        # Aplica o filtro de data em memória para este equipamento
+        manutencoes_eq = manutencoes_eq_total
+        if data_inicio:
+            manutencoes_eq = [m for m in manutencoes_eq if m.data_manutencao >= data_inicio]
+        if data_fim:
+            manutencoes_eq = [m for m in manutencoes_eq if m.data_manutencao <= data_fim]
+            
+        custo_eq = sum(m.custo for m in manutencoes_eq)
+        
+        # Dados para análise individual
         equipamentos_detalhes.append({
             'codigo': eq.codigo,
             'nome': eq.nome,
@@ -62,16 +81,14 @@ def preparar_dados_para_ia():
             'manutencoes_corretivas': len([m for m in manutencoes_eq if m.tipo == 'corretiva']),
             'custo_total': custo_eq
         })
-    
-    # Análise por setor
-    setores_stats = defaultdict(lambda: {'total_equipamentos': 0, 'custo_total': 0, 'total_manutencoes': 0})
-    for eq in equipamentos:
+        
+        # Dados para análise de setor
         setor = eq.setor
         setores_stats[setor]['total_equipamentos'] += 1
-        setores_stats[setor]['custo_total'] += Manutencao.get_custo_por_equipamento(eq.id)
-        setores_stats[setor]['total_manutencoes'] += len(Manutencao.get_by_equipamento(eq.id))
+        setores_stats[setor]['custo_total'] += custo_eq
+        setores_stats[setor]['total_manutencoes'] += len(manutencoes_eq)
     
-    # Manutenções recentes (últimos 30 dias)
+    # Manutenções recentes (interseção entre filtro e últimos 30 dias)
     data_limite = datetime.now().date() - timedelta(days=30)
     manutencoes_recentes = [m for m in manutencoes if m.data_manutencao >= data_limite]
     
@@ -88,7 +105,11 @@ def preparar_dados_para_ia():
             'manutencoes_ultimos_30_dias': len(manutencoes_recentes)
         },
         'equipamentos': equipamentos_detalhes,
-        'setores': dict(setores_stats)
+        'setores': dict(setores_stats),
+        'periodo': {
+            'inicio': data_inicio.strftime('%d/%m/%Y') if data_inicio else 'Início',
+            'fim': data_fim.strftime('%d/%m/%Y') if data_fim else 'Hoje'
+        }
     }
     
     return dados
@@ -108,16 +129,21 @@ def gerar_analise_ia(dados):
         }
 
     try:
-        # Prepara o prompt para a IA
+        # Prepara o prompt para a IA (agora com contexto de período)
+        periodo_texto = f"Período de análise: de {dados['periodo']['inicio']} até {dados['periodo']['fim']}."
+        
         prompt = f"""
 Você é um especialista em gestão de manutenção industrial de alto nível. Analise os seguintes dados de equipamentos e manutenções e forneça uma análise estratégica profunda.
+
+CONTEXTO:
+{periodo_texto}
 
 DADOS DO SISTEMA:
 {json.dumps(dados, indent=2, ensure_ascii=False)}
 
 Sua tarefa é gerar um relatório técnico em formato JSON com os seguintes pontos:
 
-1. RESUMO DA SAÚDE GERAL: Avaliação qualitativa e quantitativa do parque de máquinas.
+1. RESUMO DA SAÚDE GERAL: Avaliação qualitativa e quantitativa do parque de máquinas neste período.
 2. EQUIPAMENTOS CRÍTICOS: Identifique os equipamentos que apresentam maior risco operacional ou financeiro.
 3. ANÁLISE POR SETOR: Compare o desempenho e custos entre os diferentes setores.
 4. RECOMENDAÇÕES ESTRATÉGICAS: Sugira ações concretas para reduzir custos e aumentar a disponibilidade.
@@ -165,21 +191,57 @@ IMPORTANTE: Responda EXCLUSIVAMENTE em formato JSON puro, sem explicações fora
 @ia_bp.route('/ia/dashboard')
 def dashboard_ia():
     """
-    Exibe o dashboard com análises da IA
+    Exibe o dashboard com análises da IA com suporte a filtros
     """
-    dados = preparar_dados_para_ia()
+    data_inicio_str = request.args.get('data_inicio')
+    data_fim_str = request.args.get('data_fim')
+    filtro_pre = request.args.get('filtro_pre', '')
+    
+    data_inicio = None
+    data_fim = None
+    
+    # Processa as datas se fornecidas
+    if data_inicio_str:
+        try:
+            data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+            
+    if data_fim_str:
+        try:
+            data_fim = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+            
+    dados = preparar_dados_para_ia(data_inicio, data_fim)
     analise = gerar_analise_ia(dados)
     
     return render_template('ia_dashboard.html', 
                          dados=dados, 
-                         analise=analise)
+                         analise=analise,
+                         data_inicio=data_inicio_str,
+                         data_fim=data_fim_str,
+                         filtro_pre=filtro_pre)
 
 @ia_bp.route('/api/ia/analise')
 def api_analise_ia():
     """
     API: Retorna análise da IA em JSON
     """
-    dados = preparar_dados_para_ia()
+    data_inicio_str = request.args.get('data_inicio')
+    data_fim_str = request.args.get('data_fim')
+    
+    data_inicio = None
+    data_fim = None
+    
+    if data_inicio_str:
+        try: data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
+        except: pass
+    if data_fim_str:
+        try: data_fim = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
+        except: pass
+
+    dados = preparar_dados_para_ia(data_inicio, data_fim)
     analise = gerar_analise_ia(dados)
     
     return jsonify({
@@ -192,5 +254,18 @@ def api_dados_ia():
     """
     API: Retorna apenas os dados preparados para IA
     """
-    dados = preparar_dados_para_ia()
+    data_inicio_str = request.args.get('data_inicio')
+    data_fim_str = request.args.get('data_fim')
+    
+    data_inicio = None
+    data_fim = None
+    
+    if data_inicio_str:
+        try: data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
+        except: pass
+    if data_fim_str:
+        try: data_fim = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
+        except: pass
+
+    dados = preparar_dados_para_ia(data_inicio, data_fim)
     return jsonify(dados)

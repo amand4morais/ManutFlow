@@ -178,6 +178,55 @@ function atualizarAno() {
   
   atualizarAno();  
 
+  function confirmarDelecao(manutencaoId, equipamentoCodigo) {
+    document.getElementById('equipamentoCodigo').textContent = equipamentoCodigo;
+    document.getElementById('formDelecao').action = `/manutencoes/${manutencaoId}/deletar`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalDelecao'));
+    modal.show();
+}
+
+function aplicarPredefinicao(valor) {
+    const hoje = new Date();
+    let inicio = new Date();
+    let fim = new Date();
+    
+    // Zera horas para evitar problemas de fuso
+    hoje.setHours(0,0,0,0);
+    
+    switch(valor) {
+        case 'mes_atual':
+            inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+            break;
+            
+        case 'ultimos_3_meses':
+            inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1);
+            fim = hoje;
+            break;
+            
+        case 'ano_atual':
+            inicio = new Date(hoje.getFullYear(), 0, 1);
+            fim = new Date(hoje.getFullYear(), 11, 31);
+            break;
+            
+        case 'ano_passado':
+            inicio = new Date(hoje.getFullYear() - 1, 0, 1);
+            fim = new Date(hoje.getFullYear() - 1, 11, 31);
+            break;
+            
+        default:
+            // Se for 'Personalizado', não altera as datas automaticamente
+            return;
+    }
+    
+    // Formata para o input date (YYYY-MM-DD)
+    if (valor) {
+        document.getElementById('data_inicio').value = inicio.toISOString().split('T')[0];
+        document.getElementById('data_fim').value = fim.toISOString().split('T')[0];
+    }
+}
+
 // Exporta funções para uso global
 window.formatCurrency = formatCurrency;
 window.formatDate = formatDate;
