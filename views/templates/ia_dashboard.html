@@ -10,12 +10,53 @@
         </h1>
         <p class="lead">Insights e recomendações geradas por IA</p>
     </div>
-    <div class="col-auto">
-        <button onclick="location.reload()" class="btn btn-primary">
-            <i class="bi bi-arrow-clockwise"></i> Atualizar Análise
-        </button>
+</div>
+
+<!-- Filtros de Data -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <i class="bi bi-funnel"></i> Filtros de Período para Análise
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('ia.dashboard_ia') }}" id="formFiltro" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="filtro_pre" class="form-label">Período Pré-definido</label>
+                <select class="form-select" id="filtro_pre" name="filtro_pre" onchange="aplicarPredefinicao(this.value)">
+                    <option value="" {% if not filtro_pre %}selected{% endif %}>Personalizado</option>
+                    <option value="mes_atual" {% if filtro_pre == 'mes_atual' %}selected{% endif %}>Mês Atual</option>
+                    <option value="ultimos_3_meses" {% if filtro_pre == 'ultimos_3_meses' %}selected{% endif %}>Últimos 3 Meses</option>
+                    <option value="ano_atual" {% if filtro_pre == 'ano_atual' %}selected{% endif %}>Ano Atual</option>
+                    <option value="ano_passado" {% if filtro_pre == 'ano_passado' %}selected{% endif %}>Ano Passado</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="data_inicio" class="form-label">Data Início</label>
+                <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ data_inicio or '' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="data_fim" class="form-label">Data Fim</label>
+                <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ data_fim or '' }}">
+            </div>
+            <div class="col-md-3">
+                <div class="d-grid gap-2 d-md-flex">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-arrow-clockwise"></i> Analisar
+                    </button>
+                    <a href="{{ url_for('ia.dashboard_ia') }}" class="btn btn-outline-secondary" title="Limpar Filtros">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
+
+{% if data_inicio or data_fim %}
+<div class="alert alert-info mb-4">
+    <i class="bi bi-info-circle-fill"></i> Visualizando análise para o período: 
+    <strong>{{ data_inicio if data_inicio else 'Início' }}</strong> até <strong>{{ data_fim if data_fim else 'Hoje' }}</strong>.
+</div>
+{% endif %}
 
 <!-- Estatísticas Gerais -->
 <div class="row mb-4">
@@ -46,7 +87,7 @@
     <div class="col-md-3">
         <div class="card text-white bg-warning">
             <div class="card-body">
-                <h6 class="card-title">Custo Total</h6>
+                <h6 class="card-title">Custo no Período</h6>
                 <h2 class="card-text">R$ {{ "%.2f"|format(dados.estatisticas_gerais.custo_total) }}</h2>
             </div>
         </div>
@@ -61,7 +102,13 @@
         </h5>
     </div>
     <div class="card-body">
-        <p class="card-text" style="white-space: pre-wrap;">{{ analise.resumo_saude }}</p>
+        {% if analise.resumo_saude %}
+            <p class="card-text" style="white-space: pre-wrap;">{{ analise.resumo_saude }}</p>
+        {% else %}
+            <div class="alert alert-warning">
+                Não foi possível gerar a análise. Verifique se há dados suficientes no período selecionado.
+            </div>
+        {% endif %}
     </div>
 </div>
 
@@ -163,7 +210,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Manutenções por Tipo</h5>
+                <h5 class="mb-0">Manutenções por Tipo (No Período)</h5>
             </div>
             <div class="card-body">
                 <canvas id="graficoTipos"></canvas>
@@ -173,7 +220,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Status dos Equipamentos</h5>
+                <h5 class="mb-0">Status dos Equipamentos (Atual)</h5>
             </div>
             <div class="card-body">
                 <canvas id="graficoStatus"></canvas>
@@ -186,6 +233,46 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+// Função para pré-definições de data
+function aplicarPredefinicao(valor) {
+    const hoje = new Date();
+    let inicio = new Date();
+    let fim = new Date();
+    
+    // Zera horas para evitar problemas de fuso
+    hoje.setHours(0,0,0,0);
+    
+    switch(valor) {
+        case 'mes_atual':
+            inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+            break;
+            
+        case 'ultimos_3_meses':
+            inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1);
+            fim = hoje;
+            break;
+            
+        case 'ano_atual':
+            inicio = new Date(hoje.getFullYear(), 0, 1);
+            fim = new Date(hoje.getFullYear(), 11, 31);
+            break;
+            
+        case 'ano_passado':
+            inicio = new Date(hoje.getFullYear() - 1, 0, 1);
+            fim = new Date(hoje.getFullYear() - 1, 11, 31);
+            break;
+            
+        default:
+            return;
+    }
+    
+    if (valor) {
+        document.getElementById('data_inicio').value = inicio.toISOString().split('T')[0];
+        document.getElementById('data_fim').value = fim.toISOString().split('T')[0];
+    }
+}
+
 // Gráfico de Manutenções por Tipo
 const ctxTipos = document.getElementById('graficoTipos').getContext('2d');
 new Chart(ctxTipos, {
@@ -194,8 +281,8 @@ new Chart(ctxTipos, {
         labels: ['Preventivas', 'Corretivas'],
         datasets: [{
             data: [
-                {{ dados.estatisticas_gerais.manutencoes_preventivas }},
-                {{ dados.estatisticas_gerais.manutencoes_corretivas }}
+                {{ dados.estatisticas_gerais.manutencoes_preventivas | default(0) }},
+                {{ dados.estatisticas_gerais.manutencoes_corretivas | default(0) }}
             ],
             backgroundColor: ['#17a2b8', '#ffc107']
         }]
@@ -218,9 +305,9 @@ new Chart(ctxStatus, {
         labels: ['Ativos', 'Em Manutenção', 'Sucateados'],
         datasets: [{
             data: [
-                {{ dados.estatisticas_gerais.equipamentos_ativos }},
-                {{ dados.estatisticas_gerais.equipamentos_em_manutencao }},
-                {{ dados.estatisticas_gerais.equipamentos_sucateados }}
+                {{ dados.estatisticas_gerais.equipamentos_ativos | default(0) }},
+                {{ dados.estatisticas_gerais.equipamentos_em_manutencao | default(0) }},
+                {{ dados.estatisticas_gerais.equipamentos_sucateados | default(0) }}
             ],
             backgroundColor: ['#28a745', '#dc3545', '#6c757d']
         }]
