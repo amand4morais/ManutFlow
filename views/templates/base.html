@@ -48,6 +48,24 @@
                             <i class="bi bi-cpu"></i> Análise IA
                         </a>
                     </li>
+                    
+                    <!-- Botão de Login/Cadastro (Solicitado pelo usuário) -->
+                    <li class="nav-item ms-lg-3">
+                        {% if current_user.is_authenticated %}
+                            <div class="dropdown">
+                                <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i> {{ current_user.nome }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right"></i> Sair (Em breve)</a></li>
+                                </ul>
+                            </div>
+                        {% else %}
+                            <a class="btn btn-light text-primary fw-bold" href="#" onclick="alert('A interface de Login e Cadastro será implementada em breve pela Princesa linda maravilhosa! ❤️'); return false;">
+                                <i class="bi bi-box-arrow-in-right"></i> Login | Cadastro
+                            </a>
+                        {% endif %}
+                    </li>
                 </ul>
             </div>
         </div>

@@ -9,7 +9,6 @@ from datetime import datetime
 manutencao_bp = Blueprint('manutencao', __name__)
 
 @manutencao_bp.route('/manutencoes')
-@login_required
 def listar_manutencoes():
     """Lista todas as manutenções"""
     manutencoes = Manutencao.get_all()

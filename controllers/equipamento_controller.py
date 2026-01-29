@@ -10,7 +10,6 @@ from models.database import db
 equipamento_bp = Blueprint('equipamento', __name__)
 
 @equipamento_bp.route('/equipamentos')
-@login_required
 def listar_equipamentos():
     """Lista todos os equipamentos"""
     equipamentos = Equipamento.get_all()

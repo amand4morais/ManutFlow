@@ -37,7 +37,13 @@ app.config.from_object(config)
 # Configuração do Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'auth.login'
+
+# Personalização do comportamento quando o usuário não está logado
+@login_manager.unauthorized_handler
+def unauthorized():
+    from flask import flash, redirect, url_for
+    flash('Atenção: Você precisa estar logado para acessar as funcionalidades do sistema.', 'warning')
+    return redirect(url_for('index'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -83,7 +89,17 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('base.html'), 500
+    from flask import flash, redirect, url_for
+    flash('Ocorreu um erro interno. Certifique-se de estar logado para acessar certas funcionalidades.', 'danger')
+    return redirect(url_for('index'))
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    from flask import flash, redirect, url_for
+    # Se for erro de autenticação do Flask-Login, o unauthorized_handler já cuida
+    # Para outros erros que gerariam tela de Exception:
+    flash(f'Aviso: Para realizar esta ação, você precisa estar logado no sistema.', 'warning')
+    return redirect(url_for('index'))
 
 # Contexto do template
 @app.context_processor
