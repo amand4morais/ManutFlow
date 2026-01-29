@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro - ManutFlow{% endblock %}
+
+{% block body_class %}auth-body{% endblock %}
+
+{% block layout %}
+<div class="auth-container">
+    <!-- Lado Esquerdo -->
+    <div class="auth-side-welcome">
+        <a href="{{ url_for('index') }}" class="back-home"><i class="bi bi-arrow-left"></i> Voltar</a>
+        
+        <div class="text-start">
+            <h1>JUNTE-SE<br>A NÓS!</h1>
+            <p>Crie sua conta no ManutFlow e comece a otimizar o controle do seu parque industrial hoje mesmo.</p>
+        </div>
+    </div>
+
+    <!-- Lado Direito (Form) -->
+    <div class="auth-side-form">
+        <div class="auth-box">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show small" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="auth-header">
+                <h2>Cadastrar</h2>
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.cadastro') }}">
+                <div class="auth-input-group">
+                    <label class="auth-label">Nome Completo</label>
+                    <input type="text" name="username" class="auth-input" required>
+                    <i class="bi bi-person auth-icon"></i>
+                </div>
+
+                <div class="auth-input-group">
+                    <label class="auth-label">E-mail</label>
+                    <input type="email" name="email" class="auth-input" required>
+                    <i class="bi bi-envelope auth-icon"></i>
+                </div>
+
+                <div class="auth-input-group">
+                    <label class="auth-label">Senha</label>
+                    <input type="password" name="password" class="auth-input" required>
+                    <i class="bi bi-lock auth-icon"></i>
+                </div>
+
+                <div class="auth-input-group">
+                    <label class="auth-label">Setor</label>
+                    <select name="setor_id" class="auth-input" required style="cursor: pointer;">
+                        <option value="" disabled selected>Selecione seu setor</option>
+                        {% for setor in setores %}
+                            <option value="{{ setor.id }}" style="color: black;">{{ setor.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <i class="bi bi-building auth-icon"></i>
+                </div>
+
+                <button type="submit" class="btn btn-auth">Cadastrar</button>
+            </form>
+
+            <div class="auth-footer">
+                Já tem uma conta? <a href="{{ url_for('auth.login') }}">Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

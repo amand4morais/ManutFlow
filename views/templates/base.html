@@ -16,86 +16,90 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="bi bi-tools"></i> Sistema de Manutenção
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">
-                            <i class="bi bi-house-door"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('equipamento.listar_equipamentos') }}">
-                            <i class="bi bi-gear"></i> Equipamentos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('manutencao.listar_manutencoes') }}">
-                            <i class="bi bi-wrench"></i> Manutenções
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('ia.dashboard_ia') }}">
-                            <i class="bi bi-cpu"></i> Análise IA
-                        </a>
-                    </li>
-                    
-                    <!-- Botão de Login/Cadastro (Solicitado pelo usuário) -->
-                    <li class="nav-item ms-lg-3">
-                        {% if current_user.is_authenticated %}
-                            <div class="dropdown">
-                                <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle"></i> {{ current_user.nome }}
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right"></i> Sair (Em breve)</a></li>
-                                </ul>
-                            </div>
-                        {% else %}
-                            <a class="btn btn-light text-primary fw-bold" href="#" onclick="alert('A interface de Login e Cadastro será implementada em breve pela Princesa linda maravilhosa! ❤️'); return false;">
-                                <i class="bi bi-box-arrow-in-right"></i> Login | Cadastro
+<body class="{% block body_class %}{% endblock %}">
+    {% block layout %}
+        <!-- Layout Padrão (Navbar + Conteúdo + Footer) -->
+        
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ url_for('index') }}">
+                    <i class="bi bi-tools"></i> Sistema de Manutenção
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('index') }}">
+                                <i class="bi bi-house-door"></i> Dashboard
                             </a>
-                        {% endif %}
-                    </li>
-                </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('equipamento.listar_equipamentos') }}">
+                                <i class="bi bi-gear"></i> Equipamentos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('manutencao.listar_manutencoes') }}">
+                                <i class="bi bi-wrench"></i> Manutenções
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('ia.dashboard_ia') }}">
+                                <i class="bi bi-cpu"></i> Análise IA
+                            </a>
+                        </li>
+                        
+                        <!-- Botão de Login/Cadastro -->
+                        <li class="nav-item ms-lg-3">
+                            {% if current_user.is_authenticated %}
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-circle"></i> {{ current_user.nome }}
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                        <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+                                    </ul>
+                                </div>
+                            {% else %}
+                                <a class="btn btn-light text-primary fw-bold" href="{{ url_for('auth.login') }}">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login | Cadastro
+                                </a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
             </div>
+        </nav>
+
+        <!-- Flash Messages (Layout Padrão) -->
+        <div class="container mt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
         </div>
-    </nav>
 
-    <!-- Flash Messages -->
-    <div class="container mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
+        <!-- Main Content -->
+        <main class="container my-4">
+            {% block content %}{% endblock %}
+        </main>
 
-    <!-- Main Content -->
-    <main class="container my-4">
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-light text-center text-muted py-3 mt-5">
-        <div class="container">
-            <p class="mb-0">Sistema de Controle de Manutenção de Equipamentos &copy; 2026</p>
-        </div>
-    </footer>
+        <!-- Footer -->
+        <footer class="bg-light text-center text-muted py-3 mt-5">
+            <div class="container">
+                <p class="mb-0">Sistema de Controle de Manutenção de Equipamentos &copy; 2026</p>
+            </div>
+        </footer>
+    {% endblock %}
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

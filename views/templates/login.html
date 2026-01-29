@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Login - ManutFlow{% endblock %}
+
+{% block body_class %}auth-body{% endblock %}
+
+{% block layout %}
+<div class="auth-container">
+    <!-- Lado Esquerdo -->
+    <div class="auth-side-welcome">
+        <a href="{{ url_for('index') }}" class="back-home"><i class="bi bi-arrow-left"></i> Voltar</a>
+        
+        <div class="text-start">
+            <h1>BEM-VINDO<br>DE VOLTA!</h1>
+            <p>Acesse o sistema ManutFlow para gerenciar seus equipamentos e manutenções com eficiência e inteligência.</p>
+        </div>
+    </div>
+
+    <!-- Lado Direito (Form) -->
+    <div class="auth-side-form">
+        <div class="auth-box">
+            <!-- Flash Messages (Específico para o layout de login) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show small" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="auth-header">
+                <h2>Entrar</h2>
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="auth-input-group">
+                    <label class="auth-label">E-mail</label>
+                    <input type="email" name="email" class="auth-input" required>
+                    <i class="bi bi-envelope auth-icon"></i>
+                </div>
+
+                <div class="auth-input-group">
+                    <label class="auth-label">Senha</label>
+                    <input type="password" name="password" class="auth-input" required>
+                    <i class="bi bi-lock auth-icon"></i>
+                </div>
+
+                <button type="submit" class="btn btn-auth">Entrar</button>
+            </form>
+
+            <div class="auth-footer">
+                Ainda não tem uma conta? <a href="{{ url_for('auth.cadastro') }}">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

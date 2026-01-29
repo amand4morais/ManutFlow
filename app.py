@@ -4,7 +4,7 @@ from models.database import db, init_db
 import os
 from pathlib import Path
 
-# IMPORTE TODOS OS MODELOS AQUI PARA O SQLALCHEMY CRIAR AS TABELAS
+# IMPORTE TODOS OS MODELOS AQUI
 from models.equipamento import Equipamento
 from models.manutencao import Manutencao
 from models.setor import Setor
@@ -14,51 +14,46 @@ from controllers.equipamento_controller import equipamento_bp
 from controllers.manutencao_controller import manutencao_bp
 from controllers.ia_controller import ia_bp
 from controllers.setor_controller import setor_bp
+from controllers.auth_controller import auth_bp # NOVO IMPORT
 
 import config
 from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
 
-# Define os caminhos absolutos para templates e estáticos
 BASE_DIR = Path(__file__).parent.absolute()
 TEMPLATE_DIR = str(BASE_DIR / 'views' / 'templates')
 STATIC_DIR = str(BASE_DIR / 'views' / 'static')
 
-# Cria a aplicação Flask com caminhos explícitos
 app = Flask(__name__, 
             template_folder=TEMPLATE_DIR,
             static_folder=STATIC_DIR)
 
-# Carrega configurações
 app.config.from_object(config)
 
-# Configuração do Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'auth.login' # Define a rota de login padrão
 
-# Personalização do comportamento quando o usuário não está logado
 @login_manager.unauthorized_handler
 def unauthorized():
     from flask import flash, redirect, url_for
     flash('Atenção: Você precisa estar logado para acessar as funcionalidades do sistema.', 'warning')
-    return redirect(url_for('index'))
+    return redirect(url_for('auth.login')) # Redireciona para o login real agora
 
 @login_manager.user_loader
 def load_user(user_id):
     return Funcionario.query.get(int(user_id))
 
-# Inicializa o banco de dados
 init_db(app)
 
-# Registra blueprints (controllers)
+# Registra blueprints
 app.register_blueprint(equipamento_bp)
 app.register_blueprint(manutencao_bp)
 app.register_blueprint(ia_bp)
 app.register_blueprint(setor_bp)
+app.register_blueprint(auth_bp) # NOVO REGISTRO
 
-# Rota principal (Dashboard)
 @app.route('/')
 def index():
     """Página inicial - Dashboard"""
@@ -82,7 +77,6 @@ def index():
         print(f"Erro ao carregar index: {str(e)}")
         return f"Erro interno: {str(e)}", 500
 
-# Tratamento de erros
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('base.html'), 404
@@ -90,18 +84,17 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     from flask import flash, redirect, url_for
-    flash('Ocorreu um erro interno. Certifique-se de estar logado para acessar certas funcionalidades.', 'danger')
+    flash('Ocorreu um erro interno.', 'danger')
     return redirect(url_for('index'))
 
 @app.errorhandler(Exception)
 def handle_exception(e):
     from flask import flash, redirect, url_for
-    # Se for erro de autenticação do Flask-Login, o unauthorized_handler já cuida
-    # Para outros erros que gerariam tela de Exception:
-    flash(f'Aviso: Para realizar esta ação, você precisa estar logado no sistema.', 'warning')
+    if "401" in str(e): # Ignora erro de auth que já é tratado
+        return redirect(url_for('auth.login'))
+    flash(f'Ocorreu um erro: {str(e)}', 'warning')
     return redirect(url_for('index'))
 
-# Contexto do template
 @app.context_processor
 def utility_processor():
     def format_currency(value):
@@ -109,8 +102,4 @@ def utility_processor():
     return dict(format_currency=format_currency)
 
 if __name__ == '__main__':
-    print("=" * 60)
-    print(f"Diretório Base: {BASE_DIR}")
-    print(f"Diretório Templates: {TEMPLATE_DIR}")
-    print("=" * 60)
     app.run(host='0.0.0.0', port=5000, debug=True)
