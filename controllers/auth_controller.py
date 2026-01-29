@@ -60,6 +60,7 @@ def cadastro():
             nome=nome,
             email=email,
             senha=senha,
+            setor_id=setor_id,
             is_admin=False
         )
 

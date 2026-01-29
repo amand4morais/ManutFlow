@@ -52,6 +52,14 @@
                             </a>
                         </li>
                         
+                        {% if current_user.is_authenticated and current_user.is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('setor.lista') }}">
+                                <i class="bi bi-building"></i> Setores
+                            </a>
+                        </li>
+                        {% endif %}
+                        
                         <!-- Botão de Login/Cadastro -->
                         <li class="nav-item ms-lg-3">
                             {% if current_user.is_authenticated %}

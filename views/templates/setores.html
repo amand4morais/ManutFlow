@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Setores - Sistema de Manutenção{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="bi bi-building"></i> Setores
+        </h1>
+        <p class="lead">Gerenciamento de setores da empresa</p>
+    </div>
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalSetor">
+            <i class="bi bi-plus-circle"></i> Novo Setor
+        </button>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if setores %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 10%">ID</th>
+                            <th>Nome do Setor</th>
+                            <th style="width: 20%">Equipamentos</th>
+                            <th style="width: 20%">Funcionários</th>
+                            <th style="width: 15%" class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in setores %}
+                        <tr>
+                            <td><span class="badge bg-secondary">{{ s.id }}</span></td>
+                            <td><strong>{{ s.nome }}</strong></td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    <i class="bi bi-gear"></i> {{ s.equipamentos|length }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    <i class="bi bi-people"></i> {{ s.funcionarios|length }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-warning" 
+                                            onclick="editarSetor({{ s.id }}, '{{ s.nome }}')" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" 
+                                            onclick="confirmarDelecao({{ s.id }}, '{{ s.nome }}')" title="Excluir">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle"></i> Nenhum setor cadastrado ainda.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para Novo/Editar Setor -->
+<div class="modal fade" id="modalSetor" tabindex="-1" aria-labelledby="modalSetorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formSetor" method="POST" action="{{ url_for('setor.novo') }}">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalSetorLabel">Novo Setor</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome do Setor</label>
+                        <input type="text" class="form-control" id="nome" name="nome" required placeholder="Ex: Manutenção, TI, Produção...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnSalvar">Salvar Setor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Deleção -->
+<div class="modal fade" id="modalDelecao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o setor <strong id="setorNome"></strong>?</p>
+                <p class="text-muted small"><i class="bi bi-info-circle"></i> Só é possível excluir setores que não possuem equipamentos ou funcionários vinculados.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formDelecao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editarSetor(id, nome) {
+    const modal = new bootstrap.Modal(document.getElementById('modalSetor'));
+    document.getElementById('modalSetorLabel').textContent = 'Editar Setor';
+    document.getElementById('formSetor').action = `/setores/${id}/editar`;
+    document.getElementById('nome').value = nome;
+    document.getElementById('btnSalvar').textContent = 'Atualizar Setor';
+    modal.show();
+}
+
+function confirmarDelecao(id, nome) {
+    document.getElementById('setorNome').textContent = nome;
+    document.getElementById('formDelecao').action = `/setores/${id}/deletar`;
+    const modal = new bootstrap.Modal(document.getElementById('modalDelecao'));
+    modal.show();
+}
+
+// Resetar modal ao fechar
+document.getElementById('modalSetor').addEventListener('hidden.bs.modal', function () {
+    document.getElementById('modalSetorLabel').textContent = 'Novo Setor';
+    document.getElementById('formSetor').action = "{{ url_for('setor.novo') }}";
+    document.getElementById('nome').value = '';
+    document.getElementById('btnSalvar').textContent = 'Salvar Setor';
+});
+
+{% if edit_setor %}
+    editarSetor('{{ edit_setor.id }}', '{{ edit_setor.nome }}');
+{% endif %}
+</script>
+{% endblock %}

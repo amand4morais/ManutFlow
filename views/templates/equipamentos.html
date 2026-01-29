@@ -10,11 +10,13 @@
         </h1>
         <p class="lead">Gerenciamento de equipamentos</p>
     </div>
+    {% if current_user.is_authenticated and current_user.is_admin %}
     <div class="col-auto">
         <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary btn-lg">
             <i class="bi bi-plus-circle"></i> Novo Equipamento
         </a>
     </div>
+    {% endif %}
 </div>
 
 <div class="card">
@@ -56,6 +58,7 @@
                                        class="btn btn-sm btn-info" title="Ver detalhes">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    {% if current_user.is_authenticated and current_user.is_admin %}
                                     <a href="{{ url_for('equipamento.editar_equipamento', equipamento_id=eq.id) }}" 
                                        class="btn btn-sm btn-warning" title="Editar">
                                         <i class="bi bi-pencil"></i>
@@ -65,6 +68,7 @@
                                             title="Deletar">
                                         <i class="bi bi-trash"></i>
                                     </button>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

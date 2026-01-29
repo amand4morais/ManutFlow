@@ -61,6 +61,44 @@ def nova_manutencao():
     
     return render_template('cadastro_manutencao.html', equipamentos=equipamentos)
 
+@manutencao_bp.route('/manutencoes/<int:manutencao_id>')
+@login_required
+def detalhe_manutencao(manutencao_id):
+    """Exibe detalhes de uma manutenção"""
+    manutencao = Manutencao.get_by_id(manutencao_id)
+    if not manutencao:
+        flash('Manutenção não encontrada!', 'danger')
+        return redirect(url_for('manutencao.listar_manutencoes'))
+    return render_template('detalhe_manutencao.html', manutencao=manutencao)
+
+@manutencao_bp.route('/manutencoes/<int:manutencao_id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_manutencao(manutencao_id):
+    """Edita uma manutenção existente"""
+    manutencao = Manutencao.get_by_id(manutencao_id)
+    if not manutencao:
+        flash('Manutenção não encontrada!', 'danger')
+        return redirect(url_for('manutencao.listar_manutencoes'))
+    
+    equipamentos = Equipamento.get_all()
+    
+    if request.method == 'POST':
+        try:
+            manutencao.equipamento_id = request.form.get('equipamento_id')
+            manutencao.tipo = request.form.get('tipo')
+            data_str = request.form.get('data_manutencao')
+            manutencao.data_manutencao = datetime.strptime(data_str, '%Y-%m-%d').date()
+            manutencao.descricao = request.form.get('descricao')
+            manutencao.custo = float(request.form.get('custo', '0').replace(',', '.'))
+            
+            manutencao.save()
+            flash('Manutenção atualizada com sucesso!', 'success')
+            return redirect(url_for('manutencao.listar_manutencoes'))
+        except Exception as e:
+            flash(f'Erro ao atualizar: {str(e)}', 'danger')
+            
+    return render_template('cadastro_manutencao.html', manutencao=manutencao, equipamentos=equipamentos)
+
 @manutencao_bp.route('/manutencoes/<int:manutencao_id>/deletar', methods=['POST'])
 @login_required
 def deletar_manutencao(manutencao_id):

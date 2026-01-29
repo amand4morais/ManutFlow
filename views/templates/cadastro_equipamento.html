@@ -14,36 +14,46 @@
 
 <div class="row">
     <div class="col-md-8">
-        <div class="card">
+        <div class="card shadow-sm">
             <div class="card-body">
                 <form method="POST">
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome do Equipamento *</label>
                         <input type="text" class="form-control" id="nome" name="nome" 
                                value="{% if equipamento %}{{ equipamento.nome }}{% endif %}" 
-                               required>
+                               required placeholder="Ex: Torno Mecânico">
                     </div>
 
                     <div class="mb-3">
                         <label for="codigo" class="form-label">Código *</label>
                         <input type="text" class="form-control" id="codigo" name="codigo" 
                                value="{% if equipamento %}{{ equipamento.codigo }}{% endif %}" 
-                               required>
+                               required placeholder="Ex: TM-001">
                         <div class="form-text">Código único de identificação do equipamento</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="setor" class="form-label">Setor *</label>
-                        <input type="text" class="form-control" id="setor" name="setor" 
-                               value="{% if equipamento %}{{ equipamento.setor }}{% endif %}" 
-                               required>
+                        <label for="setor_id" class="form-label">Setor *</label>
+                        <select class="form-select" id="setor_id" name="setor_id" required>
+                            <option value="" disabled {% if not equipamento %}selected{% endif %}>Selecione um setor...</option>
+                            {% for s in setores %}
+                                <option value="{{ s.id }}" {% if equipamento and equipamento.setor_id == s.id %}selected{% endif %}>
+                                    {{ s.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
 
                     <div class="mb-3">
-                        <label for="responsavel" class="form-label">Responsável *</label>
-                        <input type="text" class="form-control" id="responsavel" name="responsavel" 
-                               value="{% if equipamento %}{{ equipamento.responsavel }}{% endif %}" 
-                               required>
+                        <label for="responsavel_id" class="form-label">Responsável *</label>
+                        <select class="form-select" id="responsavel_id" name="responsavel_id" required>
+                            <option value="" disabled {% if not equipamento %}selected{% endif %}>Selecione um responsável...</option>
+                            {% for f in funcionarios %}
+                                <option value="{{ f.id }}" {% if equipamento and equipamento.responsavel_id == f.id %}selected{% endif %}>
+                                    {{ f.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
 
                     <div class="mb-3">
@@ -61,7 +71,7 @@
                         </select>
                     </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="btn btn-secondary">
                             <i class="bi bi-x-circle"></i> Cancelar
                         </a>
@@ -75,7 +85,7 @@
     </div>
 
     <div class="col-md-4">
-        <div class="card bg-light">
+        <div class="card bg-light shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">
                     <i class="bi bi-info-circle"></i> Informações

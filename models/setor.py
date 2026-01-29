@@ -8,6 +8,8 @@ class Setor(db.Model):
     
     # Relacionamento: Um setor tem muitos equipamentos
     equipamentos = db.relationship('Equipamento', backref='setor_rel', lazy=True)
+    # Relacionamento: Um setor tem muitos funcionários
+    funcionarios = db.relationship('Funcionario', backref='setor_rel', lazy=True)
 
     def __repr__(self):
         return f'<Setor {self.nome}>'
@@ -19,3 +21,11 @@ class Setor(db.Model):
     @staticmethod
     def get_all():
         return Setor.query.all()
+    
+    @staticmethod
+    def get_by_id(setor_id):
+        return Setor.query.get(setor_id)
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
