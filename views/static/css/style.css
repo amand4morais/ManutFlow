@@ -224,10 +224,12 @@ canvas {
     border-top: 2px solid rgba(0,0,0,0.1);
 }
 
-/* --- ESTILOS DE AUTENTICAÇÃO (LOGIN/CADASTRO) --- */
+:root {
+    --indigo-brand: #1C3753;
+}
 
 .auth-body {
-    background-color: #000; /* Fundo preto base */
+    background-color: #f0f2f5; /* Fundo neutro claro para a página base */
     overflow-x: hidden;
 }
 
@@ -235,20 +237,23 @@ canvas {
     min-height: 100vh;
     display: flex;
     flex-wrap: wrap;
+    background-color: #ffffff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1); /* Sombra suave no container total */
 }
 
 /* Lado Esquerdo (Welcome) */
 .auth-side-welcome {
     flex: 1;
-    background: linear-gradient(135deg, #1C3753 0%, #0f1e2e 100%);
-    color: white;
+    /* Gradiente solicitado: Azul mais claro (#4b6cb7) para Índigo (#1C3753) */
+    background: linear-gradient(135deg, #4b6cb7 0%, var(--indigo-brand) 100%);
+    color: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 3rem;
     position: relative;
-    clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%); /* Efeito diagonal sutil */
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%); /* Efeito diagonal mantido */
     z-index: 1;
 }
 
@@ -256,8 +261,9 @@ canvas {
 @media (max-width: 768px) {
     .auth-side-welcome {
         clip-path: none;
-        min-height: 200px;
+        min-height: 250px;
         flex: 0 0 100%;
+        text-align: center;
     }
 }
 
@@ -266,18 +272,20 @@ canvas {
     font-size: 3.5rem;
     margin-bottom: 1rem;
     text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
 
 .auth-side-welcome p {
     font-size: 1.1rem;
-    opacity: 0.8;
+    opacity: 0.9;
     max-width: 400px;
+    font-weight: 300;
 }
 
 /* Lado Direito (Formulário) */
 .auth-side-form {
     flex: 1;
-    background-color: #050505;
+    background-color: #ffffff; /* FUNDO BRANCO SOLICITADO */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -295,24 +303,26 @@ canvas {
 
 .auth-header {
     margin-bottom: 2rem;
-    text-align: right; /* Título alinhado à direita como na ref */
+    text-align: center; /* CENTRALIZADO SOLICITADO */
 }
 
 .auth-header h2 {
-    color: white;
-    font-weight: 700;
+    color: var(--indigo-brand); /* Cor escura para contrastar com fundo branco */
+    font-weight: 800;
     font-size: 2.5rem;
+    margin-bottom: 0.5rem;
 }
 
-/* Inputs estilizados */
+/* Inputs estilizados para fundo branco */
 .auth-input-group {
     margin-bottom: 1.5rem;
     position: relative;
 }
 
 .auth-label {
-    color: #aaa;
+    color: #666; /* Cinza escuro */
     font-size: 0.9rem;
+    font-weight: 600;
     margin-bottom: 0.5rem;
     display: block;
 }
@@ -321,68 +331,82 @@ canvas {
     width: 100%;
     background: transparent;
     border: none;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #ddd; /* Linha cinza clara */
     padding: 10px 0;
-    color: white;
+    color: #333; /* Texto escuro */
     font-size: 1rem;
-    transition: border-color 0.3s;
+    transition: all 0.3s;
 }
 
 .auth-input:focus {
     outline: none;
-    border-bottom-color: #1C3753; /* Cor Índigo no foco */
+    border-bottom-color: var(--indigo-brand); /* Linha fica índigo no foco */
 }
 
+/* Ícones ajustados para fundo branco */
 .auth-icon {
     position: absolute;
     right: 0;
     top: 35px;
-    color: white;
+    color: var(--indigo-brand); /* Ícone índigo */
+    opacity: 0.7;
 }
 
 /* Botão */
 .btn-auth {
     width: 100%;
-    background: linear-gradient(90deg, #1C3753 0%, #2a527a 100%);
+    background: linear-gradient(90deg, var(--indigo-brand) 0%, #2a527a 100%);
     border: none;
     color: white;
     padding: 12px;
-    border-radius: 25px; /* Arredondado */
+    border-radius: 25px;
     font-weight: 600;
     font-size: 1.1rem;
-    margin-top: 1rem;
-    transition: transform 0.2s;
+    margin-top: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
 }
 
 .btn-auth:hover {
-    transform: scale(1.02);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(28, 55, 83, 0.3);
     color: white;
-    box-shadow: 0 0 15px rgba(28, 55, 83, 0.5);
 }
 
 .auth-footer {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     text-align: center;
     color: #666;
+    font-size: 0.95rem;
 }
 
 .auth-footer a {
-    color: #1C3753;
+    color: var(--indigo-brand);
     text-decoration: none;
     font-weight: bold;
+    transition: color 0.2s;
 }
 
 .auth-footer a:hover {
+    color: #4b6cb7;
     text-decoration: underline;
 }
 
 /* Link flutuante para voltar */
 .back-home {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    color: rgba(255,255,255,0.5);
+    top: 30px;
+    left: 30px;
+    color: rgba(255,255,255,0.8);
     text-decoration: none;
     z-index: 10;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
 }
-.back-home:hover { color: white; }
+.back-home:hover { 
+    color: white; 
+    transform: translateX(-3px);
+}
