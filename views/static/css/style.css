@@ -224,6 +224,9 @@ canvas {
     border-top: 2px solid rgba(0,0,0,0.1);
 }
 
+/* --- ESTILOS DE AUTENTICAÇÃO (LOGIN/CADASTRO) --- */
+
+/* Variável necessária caso este arquivo seja usado isoladamente */
 :root {
     --indigo-brand: #1C3753;
 }
@@ -237,8 +240,8 @@ canvas {
     min-height: 100vh;
     display: flex;
     flex-wrap: wrap;
-    background-color: #ffffff;
     box-shadow: 0 0 20px rgba(0,0,0,0.1); /* Sombra suave no container total */
+    background-color: #ffffff; /* ADICIONADO: Garante que o recorte diagonal fique branco */
 }
 
 /* Lado Esquerdo (Welcome) */
@@ -246,7 +249,7 @@ canvas {
     flex: 1;
     /* Gradiente solicitado: Azul mais claro (#4b6cb7) para Índigo (#1C3753) */
     background: linear-gradient(135deg, #4b6cb7 0%, var(--indigo-brand) 100%);
-    color: #ffffff;
+    color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -409,4 +412,9 @@ canvas {
 .back-home:hover { 
     color: white; 
     transform: translateX(-3px);
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }

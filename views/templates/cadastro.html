@@ -44,14 +44,15 @@
 
                 <div class="auth-input-group">
                     <label class="auth-label">E-mail</label>
-                    <input type="email" name="email" class="auth-input" required>
+                    <input type="email" name="email" class="auth-input" placeholder="exemplo@exempla.com" required>
                     <i class="bi bi-envelope auth-icon"></i>
                 </div>
 
                 <div class="auth-input-group">
                     <label class="auth-label">Senha</label>
-                    <input type="password" name="password" class="auth-input" required>
-                    <i class="bi bi-lock auth-icon"></i>
+                    <input type="password" name="password" id="password" class="auth-input" required>
+                    <!-- Ícone de Olho -->
+                    <i class="bi bi-eye-slash auth-icon password-toggle" onclick="togglePassword('password', this)"></i>
                 </div>
 
                 <div class="auth-input-group">
@@ -74,4 +75,20 @@
         </div>
     </div>
 </div>
+
+<!-- Script para alternar visibilidade da senha -->
+<script>
+function togglePassword(inputId, icon) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+    } else {
+        input.type = "password";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+    }
+}
+</script>
 {% endblock %}

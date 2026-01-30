@@ -18,7 +18,6 @@ def login():
         user = Funcionario.query.filter_by(email=email).first()
 
         # Nota: Em um ambiente de produção real, deve-se usar hash de senha (werkzeug.security)
-        # Mantendo comparação simples para compatibilidade com o seed.py existente
         if user and user.senha == senha:
             login_user(user)
             flash('Login realizado com sucesso!', 'success')
@@ -37,7 +36,7 @@ def cadastro():
         nome = request.form.get('username')
         email = request.form.get('email')
         senha = request.form.get('password')
-        setor_id = request.form.get('setor_id') # Captura o setor
+        setor_id = request.form.get('setor_id')
 
         # Validações básicas
         if not all([nome, email, senha, setor_id]):
@@ -50,12 +49,6 @@ def cadastro():
             flash('Este email já está cadastrado.', 'danger')
             return redirect(url_for('auth.cadastro'))
 
-        # Cria novo funcionário (sem privilégios de admin por padrão)
-        # O setor não é salvo diretamente na tabela funcionario neste modelo simples,
-        # mas estamos capturando para validar o fluxo. Se precisasse salvar,
-        # teria que adicionar setor_id no model Funcionario.
-        # Vou assumir que o cadastro é apenas de usuário básico.
-        
         new_user = Funcionario(
             nome=nome,
             email=email,
@@ -74,6 +67,41 @@ def cadastro():
     # Busca setores para o dropdown
     setores = Setor.get_all()
     return render_template('cadastro.html', setores=setores)
+
+@auth_bp.route('/recuperar-senha', methods=['GET', 'POST'])
+def recuperar_senha():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+        
+    if request.method == 'POST':
+        email = request.form.get('email')
+        nova_senha = request.form.get('nova_senha')
+        confirmar_senha = request.form.get('confirmar_senha')
+        
+        if not all([email, nova_senha, confirmar_senha]):
+            flash('Preencha todos os campos.', 'danger')
+            return render_template('recuperar_senha.html')
+            
+        if nova_senha != confirmar_senha:
+            flash('As senhas não coincidem.', 'danger')
+            return render_template('recuperar_senha.html')
+            
+        user = Funcionario.query.filter_by(email=email).first()
+        
+        if user:
+            try:
+                user.senha = nova_senha
+                user.save()
+                flash('Senha atualizada com sucesso! Faça login com a nova senha.', 'success')
+                return redirect(url_for('auth.login'))
+            except Exception as e:
+                flash(f'Erro ao atualizar senha: {str(e)}', 'danger')
+        else:
+            # Por segurança, geralmente não se avisa que o e-mail não existe, 
+            # mas para facilitar o uso interno, vamos avisar.
+            flash('E-mail não encontrado no sistema.', 'danger')
+            
+    return render_template('recuperar_senha.html')
 
 @auth_bp.route('/logout')
 @login_required

@@ -227,6 +227,8 @@ function aplicarPredefinicao(valor) {
     }
 }
 
+
+
 // Exporta funções para uso global
 window.formatCurrency = formatCurrency;
 window.formatDate = formatDate;

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Login - ManutFlow{% endblock %}
+{% block title %}Recuperar Senha - ManutFlow{% endblock %}
 
 {% block body_class %}auth-body{% endblock %}
 
@@ -8,11 +8,11 @@
 <div class="auth-container">
     <!-- Lado Esquerdo -->
     <div class="auth-side-welcome">
-        <a href="{{ url_for('index') }}" class="back-home"><i class="bi bi-arrow-left"></i> Voltar</a>
+        <a href="{{ url_for('auth.login') }}" class="back-home"><i class="bi bi-arrow-left"></i> Voltar ao Login</a>
         
         <div class="text-start">
-            <h1>BEM-VINDO<br>DE VOLTA!</h1>
-            <p>Acesse o sistema ManutFlow para gerenciar seus equipamentos e manutenções com eficiência e inteligência.</p>
+            <h1>RECUPERAR<br>SENHA</h1>
+            <p>Redefina suas credenciais para recuperar o acesso ao sistema de gestão ManutFlow.</p>
         </div>
     </div>
 
@@ -32,37 +32,38 @@
             {% endwith %}
 
             <div class="auth-header">
-                <h2>Entrar</h2>
+                <h2>Redefinir</h2>
             </div>
 
-            <form method="POST" action="{{ url_for('auth.login') }}">
+            <form method="POST" action="{{ url_for('auth.recuperar_senha') }}">
                 <div class="auth-input-group">
-                    <label class="auth-label">E-mail</label>
+                    <label class="auth-label">Seu E-mail Cadastrado</label>
                     <input type="email" name="email" class="auth-input" required>
                     <i class="bi bi-envelope auth-icon"></i>
                 </div>
 
                 <div class="auth-input-group">
-                    <label class="auth-label">Senha</label>
-                    <input type="password" name="password" id="password" class="auth-input" required>
-                    <!-- Ícone de Olho para visualizar senha -->
-                    <i class="bi bi-eye-slash auth-icon password-toggle" onclick="togglePassword('password', this)"></i>
+                    <label class="auth-label">Nova Senha</label>
+                    <input type="password" name="nova_senha" id="nova_senha" class="auth-input" required>
+                    <i class="bi bi-eye-slash auth-icon password-toggle" onclick="togglePassword('nova_senha', this)"></i>
                 </div>
-                
-                <!-- Link de Recuperação de Senha -->
-                <a href="{{ url_for('auth.recuperar_senha') }}" class="forgot-password-link">Esqueceu sua senha?</a>
 
-                <button type="submit" class="btn btn-auth">Entrar</button>
+                <div class="auth-input-group">
+                    <label class="auth-label">Confirmar Nova Senha</label>
+                    <input type="password" name="confirmar_senha" id="confirmar_senha" class="auth-input" required>
+                    <i class="bi bi-eye-slash auth-icon password-toggle" onclick="togglePassword('confirmar_senha', this)"></i>
+                </div>
+
+                <button type="submit" class="btn btn-auth">Alterar Senha</button>
             </form>
 
             <div class="auth-footer">
-                Ainda não tem uma conta? <a href="{{ url_for('auth.cadastro') }}">Cadastre-se</a>
+                Lembrou sua senha? <a href="{{ url_for('auth.login') }}">Entrar</a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Script para alternar visibilidade da senha -->
 <script>
 function togglePassword(inputId, icon) {
     const input = document.getElementById(inputId);
