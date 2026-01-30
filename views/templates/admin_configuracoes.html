@@ -25,6 +25,7 @@
                                 <th>E-mail</th>
                                 <th>Tipo</th>
                                 <th>Status</th>
+                                <th class="text-end">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,6 +50,11 @@
                                 </td>
                                 <td>
                                     <span class="badge bg-success-subtle text-success">Ativo</span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('auth.detalhe_funcionario', funcionario_id=func.id) }}" class="btn btn-sm btn-light border shadow-sm" title="Ver Detalhes">
+                                        <i class="bi bi-eye text-primary"></i>
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}

@@ -68,39 +68,31 @@ def cadastro():
     setores = Setor.get_all()
     return render_template('cadastro.html', setores=setores)
 
-@auth_bp.route('/recuperar-senha', methods=['GET', 'POST'])
+@auth_bp.route('/recuperar_senha', methods=['GET', 'POST'])
 def recuperar_senha():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-        
     if request.method == 'POST':
         email = request.form.get('email')
-        nova_senha = request.form.get('nova_senha')
-        confirmar_senha = request.form.get('confirmar_senha')
-        
-        if not all([email, nova_senha, confirmar_senha]):
-            flash('Preencha todos os campos.', 'danger')
-            return render_template('recuperar_senha.html')
-            
+        nova_senha = request.form.get('password')
+        confirmar_senha = request.form.get('confirm_password')
+
         if nova_senha != confirmar_senha:
             flash('As senhas não coincidem.', 'danger')
-            return render_template('recuperar_senha.html')
-            
+            return redirect(url_for('auth.recuperar_senha'))
+
         user = Funcionario.query.filter_by(email=email).first()
-        
         if user:
+            user.senha = nova_senha
             try:
-                user.senha = nova_senha
                 user.save()
-                flash('Senha atualizada com sucesso! Faça login com a nova senha.', 'success')
+                flash('Senha atualizada com sucesso!', 'success')
                 return redirect(url_for('auth.login'))
             except Exception as e:
                 flash(f'Erro ao atualizar senha: {str(e)}', 'danger')
         else:
-            # Por segurança, geralmente não se avisa que o e-mail não existe, 
+            # Por segurança, geralmente não se avisa que o e-mail não existe,
             # mas para facilitar o uso interno, vamos avisar.
             flash('E-mail não encontrado no sistema.', 'danger')
-            
+
     return render_template('recuperar_senha.html')
 
 @auth_bp.route('/perfil')
@@ -109,11 +101,11 @@ def perfil():
     # Busca manutenções que o funcionário cadastrou
     from models.manutencao import Manutencao
     manutencoes = Manutencao.query.filter_by(autor_id=current_user.id).order_by(Manutencao.data_registro.desc()).all()
-    
+
     # Busca equipamentos que o funcionário é responsável
     from models.equipamento import Equipamento
     equipamentos = Equipamento.query.filter_by(responsavel_id=current_user.id).all()
-    
+
     return render_template('perfil.html', manutencoes=manutencoes, equipamentos=equipamentos)
 
 @auth_bp.route('/perfil/configuracoes', methods=['GET', 'POST'])
@@ -123,26 +115,26 @@ def configuracoes():
         nome = request.form.get('nome')
         nova_senha = request.form.get('nova_senha')
         confirmar_senha = request.form.get('confirmar_senha')
-        
+
         if not nome:
             flash('O nome não pode estar vazio.', 'danger')
             return redirect(url_for('auth.configuracoes'))
-            
+
         current_user.nome = nome
-        
+
         if nova_senha:
             if nova_senha != confirmar_senha:
                 flash('As senhas não coincidem.', 'danger')
                 return redirect(url_for('auth.configuracoes'))
             current_user.senha = nova_senha
-            
+
         try:
             current_user.save()
             flash('Perfil atualizado com sucesso!', 'success')
             return redirect(url_for('auth.perfil'))
         except Exception as e:
             flash(f'Erro ao atualizar perfil: {str(e)}', 'danger')
-            
+
     return render_template('configuracoes_perfil.html')
 
 @auth_bp.route('/admin/configuracoes')
@@ -151,9 +143,24 @@ def admin_configuracoes():
     if not current_user.is_admin:
         flash('Acesso negado. Apenas administradores podem acessar esta página.', 'danger')
         return redirect(url_for('index'))
-        
+
     funcionarios = Funcionario.get_all()
     return render_template('admin_configuracoes.html', funcionarios=funcionarios)
+
+@auth_bp.route('/admin/funcionario/<int:funcionario_id>')
+@login_required
+def detalhe_funcionario(funcionario_id):
+    if not current_user.is_admin:
+        flash('Acesso negado. Apenas administradores podem acessar esta página.', 'danger')
+        return redirect(url_for('index'))
+    
+    funcionario = Funcionario.query.get_or_404(funcionario_id)
+    
+    # Busca manutenções que o funcionário registrou
+    from models.manutencao import Manutencao
+    manutencoes = Manutencao.query.filter_by(autor_id=funcionario.id).order_by(Manutencao.data_registro.desc()).all()
+    
+    return render_template('detalhe_funcionario.html', funcionario=funcionario, manutencoes=manutencoes)
 
 @auth_bp.route('/logout')
 @login_required
