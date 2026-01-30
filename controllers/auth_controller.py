@@ -103,6 +103,58 @@ def recuperar_senha():
             
     return render_template('recuperar_senha.html')
 
+@auth_bp.route('/perfil')
+@login_required
+def perfil():
+    # Busca manutenções que o funcionário cadastrou
+    from models.manutencao import Manutencao
+    manutencoes = Manutencao.query.filter_by(autor_id=current_user.id).order_by(Manutencao.data_registro.desc()).all()
+    
+    # Busca equipamentos que o funcionário é responsável
+    from models.equipamento import Equipamento
+    equipamentos = Equipamento.query.filter_by(responsavel_id=current_user.id).all()
+    
+    return render_template('perfil.html', manutencoes=manutencoes, equipamentos=equipamentos)
+
+@auth_bp.route('/perfil/configuracoes', methods=['GET', 'POST'])
+@login_required
+def configuracoes():
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+        nova_senha = request.form.get('nova_senha')
+        confirmar_senha = request.form.get('confirmar_senha')
+        
+        if not nome:
+            flash('O nome não pode estar vazio.', 'danger')
+            return redirect(url_for('auth.configuracoes'))
+            
+        current_user.nome = nome
+        
+        if nova_senha:
+            if nova_senha != confirmar_senha:
+                flash('As senhas não coincidem.', 'danger')
+                return redirect(url_for('auth.configuracoes'))
+            current_user.senha = nova_senha
+            
+        try:
+            current_user.save()
+            flash('Perfil atualizado com sucesso!', 'success')
+            return redirect(url_for('auth.perfil'))
+        except Exception as e:
+            flash(f'Erro ao atualizar perfil: {str(e)}', 'danger')
+            
+    return render_template('configuracoes_perfil.html')
+
+@auth_bp.route('/admin/configuracoes')
+@login_required
+def admin_configuracoes():
+    if not current_user.is_admin:
+        flash('Acesso negado. Apenas administradores podem acessar esta página.', 'danger')
+        return redirect(url_for('index'))
+        
+    funcionarios = Funcionario.get_all()
+    return render_template('admin_configuracoes.html', funcionarios=funcionarios)
+
 @auth_bp.route('/logout')
 @login_required
 def logout():

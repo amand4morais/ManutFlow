@@ -67,8 +67,13 @@
                                     <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-person-circle"></i> {{ current_user.nome }}
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                        <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                                        <li><a class="dropdown-item" href="{{ url_for('auth.perfil') }}"><i class="bi bi-person"></i> Visualizar perfil</a></li>
+                                        {% if current_user.is_admin %}
+                                            <li><a class="dropdown-item" href="{{ url_for('auth.admin_configuracoes') }}"><i class="bi bi-shield-lock"></i> Configurações de Admin</a></li>
+                                        {% endif %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
                                     </ul>
                                 </div>
                             {% else %}
