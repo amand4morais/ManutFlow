@@ -13,6 +13,8 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/logo_aguia.png') }}" type="image/x-icon">
+
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -23,9 +25,11 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ url_for('index') }}">
-                    <i class="bi bi-tools"></i> ManutFlow
-                </a>
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='img/logo_aguia.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-top me-2">
+                ManutEngine
+            </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
