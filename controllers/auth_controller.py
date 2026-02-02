@@ -72,8 +72,8 @@ def cadastro():
 def recuperar_senha():
     if request.method == 'POST':
         email = request.form.get('email')
-        nova_senha = request.form.get('password')
-        confirmar_senha = request.form.get('confirm_password')
+        nova_senha = request.form.get('nova_senha')
+        confirmar_senha = request.form.get('confirmar_senha')
 
         if nova_senha != confirmar_senha:
             flash('As senhas não coincidem.', 'danger')

@@ -40,8 +40,8 @@
                         <tr>
                             <td><strong>{{ eq.codigo }}</strong></td>
                             <td>{{ eq.nome }}</td>
-                            <td>{{ eq.setor }}</td>
-                            <td>{{ eq.responsavel }}</td>
+                            <td>{{ eq.setor_rel.nome if eq.setor_rel else "N/A" }}</td>
+                            <td>{{ eq.responsavel_rel.nome if eq.responsavel_rel else "N/A" }}</td>
                             <td>
                                 <span class="badge bg-{{ eq.get_status_color() }}">
                                     {{ eq.get_status_label() }}

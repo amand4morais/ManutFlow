@@ -10,10 +10,12 @@
         </h1>
     </div>
     <div class="col-auto">
+        {% if current_user.is_authenticated and current_user.is_admin %}
         <a href="{{ url_for('manutencao.editar_manutencao', manutencao_id=manutencao.id) }}" 
            class="btn btn-warning">
             <i class="bi bi-pencil"></i> Editar
         </a>
+        {% endif %}
         <a href="{{ url_for('manutencao.listar_manutencoes') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left"></i> Voltar
         </a>
@@ -48,11 +50,26 @@
                         <th>Registrado em:</th>
                         <td>{{ manutencao.data_registro.strftime('%d/%m/%Y %H:%M') if manutencao.data_registro else '-' }}</td>
                     </tr>
+                    <tr>
+                        <th>Autor do Registro:</th>
+                        <td>{{ manutencao.autor_rel.nome if manutencao.autor_rel else "N/A" }}</td>
+                    </tr>
                 </table>
             </div>
         </div>
-
+        
         <div class="card mt-3">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-chat-left-text"></i> Descrição</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ manutencao.descricao }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0"><i class="bi bi-gear"></i> Equipamento</h5>
             </div>
@@ -68,14 +85,14 @@
                     </tr>
                     <tr>
                         <th>Setor:</th>
-                        <td>{{ manutencao.equipamento.setor }}</td>
+                        <td>{{ manutencao.equipamento.setor_rel.nome if manutencao.equipamento.setor_rel else "N/A" }}</td>
                     </tr>
                     <tr>
                         <th>Responsável:</th>
-                        <td>{{ manutencao.equipamento.responsavel }}</td>
+                        <td>{{ manutencao.equipamento.responsavel_rel.nome if manutencao.equipamento.responsavel_rel else "N/A" }}</td>
                     </tr>
                     <tr>
-                        <th>Status:</th>
+                        <th>Status Atual:</th>
                         <td>
                             <span class="badge bg-{{ manutencao.equipamento.get_status_color() }}">
                                 {{ manutencao.equipamento.get_status_label() }}
@@ -83,21 +100,11 @@
                         </td>
                     </tr>
                 </table>
-                <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=manutencao.equipamento.id) }}" 
-                   class="btn btn-sm btn-info">
-                    <i class="bi bi-eye"></i> Ver Equipamento
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-file-text"></i> Descrição</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text" style="white-space: pre-wrap;">{{ manutencao.descricao }}</p>
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=manutencao.equipamento_id) }}" class="btn btn-outline-success">
+                        <i class="bi bi-eye"></i> Ver Equipamento Completo
+                    </a>
+                </div>
             </div>
         </div>
     </div>

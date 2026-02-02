@@ -20,13 +20,13 @@
 <!-- Filtros de Data -->
 <div class="card mb-4">
     <div class="card-header bg-light">
-        <i class="bi bi-funnel"></i> Filtros de Período
+        <i class="bi bi-bi-funnel"></i> Filtros de Período
     </div>
     <div class="card-body">
         <form method="GET" action="{{ url_for('manutencao.listar_manutencoes') }}" id="formFiltro" class="row g-3 align-items-end">
             <div class="col-md-3">
                 <label for="filtro_pre" class="form-label">Período Pré-definido</label>
-                <select class="form-select" id="filtro_pre" name="filtro_pre" onchange="aplicarPredefinicao(this.value)">
+                <select class="form-select" id="filtro_pre" onchange="aplicarPredefinicao(this.value)">
                     <option value="" {% if not filtro_pre %}selected{% endif %}>Personalizado</option>
                     <option value="mes_atual" {% if filtro_pre == 'mes_atual' %}selected{% endif %}>Mês Atual</option>
                     <option value="ultimos_3_meses" {% if filtro_pre == 'ultimos_3_meses' %}selected{% endif %}>Últimos 3 Meses</option>
@@ -66,15 +66,15 @@
                             <th>Data</th>
                             <th>Equipamento</th>
                             <th>Tipo</th>
-                            <th>Descrição</th>
                             <th>Custo</th>
+                            <th>Autor</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for m in manutencoes %}
                         <tr>
-                            <td>{{ m.data_manutencao.strftime('%d/%m/%Y') if m.data_manutencao else '-' }}</td>
+                            <td>{{ m.data_manutencao.strftime('%d/%m/%Y') }}</td>
                             <td>
                                 <strong>{{ m.equipamento.codigo }}</strong><br>
                                 <small class="text-muted">{{ m.equipamento.nome }}</small>
@@ -84,23 +84,25 @@
                                     {{ m.get_tipo_label() }}
                                 </span>
                             </td>
-                            <td>{{ m.descricao[:50] }}{% if m.descricao|length > 50 %}...{% endif %}</td>
                             <td>R$ {{ "%.2f"|format(m.custo) }}</td>
+                            <td>{{ m.autor_rel.nome if m.autor_rel else "N/A" }}</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <a href="{{ url_for('manutencao.detalhe_manutencao', manutencao_id=m.id) }}" 
                                        class="btn btn-sm btn-info" title="Ver detalhes">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    {% if current_user.is_authenticated and current_user.is_admin %}
                                     <a href="{{ url_for('manutencao.editar_manutencao', manutencao_id=m.id) }}" 
                                        class="btn btn-sm btn-warning" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <button type="button" class="btn btn-sm btn-danger" 
-                                            onclick="confirmarDelecao('{{ m.id }}', '{{ m.equipamento.codigo }}')" 
+                                            onclick="confirmarDelecao({{ m.id }}, '{{ m.data_manutencao.strftime('%d/%m/%Y') }}', '{{ m.equipamento.codigo }}')" 
                                             title="Deletar">
                                         <i class="bi bi-trash"></i>
                                     </button>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -110,8 +112,7 @@
             </div>
         {% else %}
             <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> Nenhuma manutenção registrada ainda.
-                <a href="{{ url_for('manutencao.nova_manutencao') }}" class="alert-link">Registrar primeira manutenção</a>
+                <i class="bi bi-info-circle"></i> Nenhuma manutenção encontrada para este período.
             </div>
         {% endif %}
     </div>
@@ -126,7 +127,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Tem certeza que deseja deletar esta manutenção do equipamento <strong id="equipamentoCodigo"></strong>?</p>
+                <p>Tem certeza que deseja deletar a manutenção do dia <strong id="manutencaoData"></strong> do equipamento <strong id="manutencaoEquipamento"></strong>?</p>
                 <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> Esta ação não pode ser desfeita!</p>
             </div>
             <div class="modal-footer">
@@ -142,12 +143,37 @@
 
 {% block extra_js %}
 <script>
-function confirmarDelecao(manutencaoId, equipamentoCodigo) {
-    document.getElementById('equipamentoCodigo').textContent = equipamentoCodigo;
+function confirmarDelecao(manutencaoId, data, codigo) {
+    document.getElementById('manutencaoData').textContent = data;
+    document.getElementById('manutencaoEquipamento').textContent = codigo;
     document.getElementById('formDelecao').action = `/manutencoes/${manutencaoId}/deletar`;
     
     const modal = new bootstrap.Modal(document.getElementById('modalDelecao'));
     modal.show();
+}
+
+function aplicarPredefinicao(valor) {
+    const hoje = new Date();
+    let inicio = new Date();
+    let fim = new Date();
+    
+    if (valor === 'mes_atual') {
+        inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+    } else if (valor === 'ultimos_3_meses') {
+        inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 3, hoje.getDate());
+    } else if (valor === 'ano_atual') {
+        inicio = new Date(hoje.getFullYear(), 0, 1);
+        fim = new Date(hoje.getFullYear(), 11, 31);
+    } else if (valor === 'ano_passado') {
+        inicio = new Date(hoje.getFullYear() - 1, 0, 1);
+        fim = new Date(hoje.getFullYear() - 1, 11, 31);
+    } else {
+        return;
+    }
+    
+    document.getElementById('data_inicio').value = inicio.toISOString().split('T')[0];
+    document.getElementById('data_fim').value = fim.toISOString().split('T')[0];
 }
 </script>
 {% endblock %}

@@ -19,6 +19,9 @@ class Manutencao(db.Model):
     # Da Branch: Quem registrou a manutenção
     autor_id = db.Column(db.Integer, db.ForeignKey('funcionarios.id'), nullable=False)
     
+    # Relacionamento para acessar o nome do autor
+    autor_rel = db.relationship('Funcionario', backref='manutencoes_registradas', lazy=True)
+    
     data_registro = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):

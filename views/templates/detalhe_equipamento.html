@@ -11,10 +11,12 @@
         <p class="lead">Código: <strong>{{ equipamento.codigo }}</strong></p>
     </div>
     <div class="col-auto">
+        {% if current_user.is_authenticated and current_user.is_admin %}
         <a href="{{ url_for('equipamento.editar_equipamento', equipamento_id=equipamento.id) }}" 
            class="btn btn-warning">
             <i class="bi bi-pencil"></i> Editar
         </a>
+        {% endif %}
         <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left"></i> Voltar
         </a>
@@ -40,11 +42,11 @@
                     </tr>
                     <tr>
                         <th>Setor:</th>
-                        <td>{{ equipamento.setor }}</td>
+                        <td>{{ equipamento.setor_rel.nome if equipamento.setor_rel else "N/A" }}</td>
                     </tr>
                     <tr>
                         <th>Responsável:</th>
-                        <td>{{ equipamento.responsavel }}</td>
+                        <td>{{ equipamento.responsavel_rel.nome if equipamento.responsavel_rel else "N/A" }}</td>
                     </tr>
                     <tr>
                         <th>Status:</th>
@@ -66,25 +68,16 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Estatísticas</h5>
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Resumo Financeiro</h5>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-6 mb-3">
-                        <h3 class="text-primary">{{ manutencoes|length }}</h3>
-                        <p class="text-muted mb-0">Total de Manutenções</p>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <h3 class="text-success">R$ {{ "%.2f"|format(custo_total) }}</h3>
-                        <p class="text-muted mb-0">Custo Total</p>
-                    </div>
-                    <div class="col-6">
-                        <h3 class="text-info">{{ manutencoes|selectattr('tipo', 'equalto', 'preventiva')|list|length }}</h3>
-                        <p class="text-muted mb-0">Preventivas</p>
-                    </div>
-                    <div class="col-6">
-                        <h3 class="text-warning">{{ manutencoes|selectattr('tipo', 'equalto', 'corretiva')|list|length }}</h3>
-                        <p class="text-muted mb-0">Corretivas</p>
+            <div class="card-body text-center">
+                <h6 class="text-muted">Custo Total em Manutenções</h6>
+                <h2 class="display-4 text-primary">R$ {{ "%.2f"|format(custo_total) }}</h2>
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <h6>Manutenções</h6>
+                        <h3>{{ manutencoes|length }}</h3>
                     </div>
                 </div>
             </div>
@@ -93,53 +86,57 @@
 </div>
 
 <!-- Histórico de Manutenções -->
-<div class="card">
-    <div class="card-header bg-success text-white">
-        <h5 class="mb-0">
-            <i class="bi bi-clock-history"></i> Histórico de Manutenções
-        </h5>
-    </div>
-    <div class="card-body">
-        {% if manutencoes %}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Data</th>
-                            <th>Tipo</th>
-                            <th>Descrição</th>
-                            <th>Custo</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for m in manutencoes %}
-                        <tr>
-                            <td>{{ m.data_manutencao.strftime('%d/%m/%Y') if m.data_manutencao else '-' }}</td>
-                            <td>
-                                <span class="badge bg-{{ m.get_tipo_color() }}">
-                                    {{ m.get_tipo_label() }}
-                                </span>
-                            </td>
-                            <td>{{ m.descricao[:50] }}{% if m.descricao|length > 50 %}...{% endif %}</td>
-                            <td>R$ {{ "%.2f"|format(m.custo) }}</td>
-                            <td>
-                                <a href="{{ url_for('manutencao.detalhe_manutencao', manutencao_id=m.id) }}" 
-                                   class="btn btn-sm btn-info">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Histórico de Manutenções</h5>
+                <a href="{{ url_for('manutencao.nova_manutencao', equipamento_id=equipamento.id) }}" class="btn btn-sm btn-light">
+                    <i class="bi bi-plus-circle"></i> Registrar Manutenção
+                </a>
             </div>
-        {% else %}
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> Nenhuma manutenção registrada para este equipamento.
-                <a href="{{ url_for('manutencao.nova_manutencao') }}" class="alert-link">Registrar primeira manutenção</a>
+            <div class="card-body">
+                {% if manutencoes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Descrição</th>
+                                    <th>Custo</th>
+                                    <th>Autor</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in manutencoes %}
+                                <tr>
+                                    <td>{{ m.data_manutencao.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ m.get_tipo_color() }}">
+                                            {{ m.get_tipo_label() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ m.descricao[:50] }}{% if m.descricao|length > 50 %}...{% endif %}</td>
+                                    <td>R$ {{ "%.2f"|format(m.custo) }}</td>
+                                    <td>{{ m.autor_rel.nome if m.autor_rel else "N/A" }}</td>
+                                    <td>
+                                        <a href="{{ url_for('manutencao.detalhe_manutencao', manutencao_id=m.id) }}" 
+                                           class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted my-4">Nenhuma manutenção registrada para este equipamento.</p>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
