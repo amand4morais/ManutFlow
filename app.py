@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user, login_required
 from models.database import db, init_db
 import os
 from pathlib import Path
@@ -14,7 +14,7 @@ from controllers.equipamento_controller import equipamento_bp
 from controllers.manutencao_controller import manutencao_bp
 from controllers.ia_controller import ia_bp
 from controllers.setor_controller import setor_bp
-from controllers.auth_controller import auth_bp # NOVO IMPORT
+from controllers.auth_controller import auth_bp
 
 import config
 from dotenv import load_dotenv
@@ -33,13 +33,13 @@ app.config.from_object(config)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'auth.login' # Define a rota de login padrão
+login_manager.login_view = 'auth.login'
 
 @login_manager.unauthorized_handler
 def unauthorized():
     from flask import flash, redirect, url_for
     flash('Atenção: Você precisa estar logado para acessar as funcionalidades do sistema.', 'warning')
-    return redirect(url_for('auth.login')) # Redireciona para o login real agora
+    return redirect(url_for('auth.login'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -52,11 +52,25 @@ app.register_blueprint(equipamento_bp)
 app.register_blueprint(manutencao_bp)
 app.register_blueprint(ia_bp)
 app.register_blueprint(setor_bp)
-app.register_blueprint(auth_bp) # NOVO REGISTRO
+app.register_blueprint(auth_bp)
 
 @app.route('/')
 def index():
-    """Página inicial - Dashboard"""
+    """
+    Rota Raiz:
+    - Se deslogado: Mostra Landing Page
+    - Se logado: Redireciona para o Dashboard
+    """
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return render_template('landing.html')
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    """
+    Rota do Dashboard (Protegida)
+    """
     try:
         equipamentos = Equipamento.get_all()
         manutencoes = Manutencao.get_all()
@@ -74,7 +88,7 @@ def index():
                              equipamentos_em_manutencao=equipamentos_em_manutencao,
                              total_manutencoes=total_manutencoes)
     except Exception as e:
-        print(f"Erro ao carregar index: {str(e)}")
+        print(f"Erro ao carregar dashboard: {str(e)}")
         return f"Erro interno: {str(e)}", 500
 
 @app.errorhandler(404)
@@ -85,15 +99,18 @@ def page_not_found(e):
 def internal_server_error(e):
     from flask import flash, redirect, url_for
     flash('Ocorreu um erro interno.', 'danger')
-    return redirect(url_for('index'))
+    return redirect(url_for('dashboard'))
 
 @app.errorhandler(Exception)
 def handle_exception(e):
     from flask import flash, redirect, url_for
-    if "401" in str(e): # Ignora erro de auth que já é tratado
+    if "401" in str(e): 
         return redirect(url_for('auth.login'))
     flash(f'Ocorreu um erro: {str(e)}', 'warning')
-    return redirect(url_for('index'))
+    # Tenta redirecionar para dashboard se logado, senão login
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('auth.login'))
 
 @app.context_processor
 def utility_processor():

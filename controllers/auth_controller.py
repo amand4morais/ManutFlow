@@ -9,7 +9,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
         email = request.form.get('email')
@@ -17,11 +17,11 @@ def login():
 
         user = Funcionario.query.filter_by(email=email).first()
 
-        # Nota: Em um ambiente de produção real, deve-se usar hash de senha (werkzeug.security)
+        # Nota: Em um ambiente de produção real, deve-se usar hash de senha
         if user and user.senha == senha:
             login_user(user)
             flash('Login realizado com sucesso!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('dashboard'))
         else:
             flash('Email ou senha incorretos.', 'danger')
 
@@ -30,7 +30,7 @@ def login():
 @auth_bp.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
         nome = request.form.get('username')
@@ -89,8 +89,6 @@ def recuperar_senha():
             except Exception as e:
                 flash(f'Erro ao atualizar senha: {str(e)}', 'danger')
         else:
-            # Por segurança, geralmente não se avisa que o e-mail não existe,
-            # mas para facilitar o uso interno, vamos avisar.
             flash('E-mail não encontrado no sistema.', 'danger')
 
     return render_template('recuperar_senha.html')
@@ -142,7 +140,7 @@ def configuracoes():
 def admin_configuracoes():
     if not current_user.is_admin:
         flash('Acesso negado. Apenas administradores podem acessar esta página.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard'))
 
     funcionarios = Funcionario.get_all()
     return render_template('admin_configuracoes.html', funcionarios=funcionarios)
@@ -152,7 +150,7 @@ def admin_configuracoes():
 def detalhe_funcionario(funcionario_id):
     if not current_user.is_admin:
         flash('Acesso negado. Apenas administradores podem acessar esta página.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard'))
     
     funcionario = Funcionario.query.get_or_404(funcionario_id)
     

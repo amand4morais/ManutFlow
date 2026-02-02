@@ -13,6 +13,8 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/logo_aguia.png') }}" type="image/x-icon">
+
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -23,16 +25,20 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ url_for('index') }}">
-                    <i class="bi bi-tools"></i> ManutFlow
-                </a>
+            <!-- Link da Logo agora aponta para dashboard -->
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard') }}">
+                <img src="{{ url_for('static', filename='img/logo_aguia.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-top me-2">
+                ManutEngine
+            </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('index') }}">
+                            <!-- Link Dashboard corrigido -->
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">
                                 <i class="bi bi-house-door"></i> Dashboard
                             </a>
                         </li>
@@ -46,11 +52,13 @@
                                 <i class="bi bi-wrench"></i> Manutenções
                             </a>
                         </li>
+                        {% if current_user.is_authenticated and current_user.is_admin %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('ia.dashboard_ia') }}">
                                 <i class="bi bi-cpu"></i> Análise IA
                             </a>
                         </li>
+                        {% endif %}
                         
                         {% if current_user.is_authenticated and current_user.is_admin %}
                         <li class="nav-item">
@@ -60,7 +68,7 @@
                         </li>
                         {% endif %}
                         
-                        <!-- Botão de Login/Cadastro (Da Branch) -->
+                        <!-- Botão de Login/Cadastro -->
                         <li class="nav-item ms-lg-3">
                             {% if current_user.is_authenticated %}
                                 <div class="dropdown">
@@ -87,7 +95,7 @@
             </div>
         </nav>
 
-        <!-- Flash Messages (Layout Padrão) -->
+        <!-- Flash Messages -->
         <div class="container mt-3">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ManutFlow - Gestão Inteligente</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- Cabeçalho Fixo Transparente -->
+    <nav class="navbar fixed-top landing-navbar">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="landing-brand" href="#">
+                <i class="bi bi-tools me-2"></i>ManutFlow
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light rounded-pill px-4 fw-bold">
+                Entrar
+            </a>
+        </div>
+    </nav>
+
+    <!-- Seção Hero (Tela Inteira) -->
+    <section class="hero-section">
+        <!-- Elementos decorativos de fundo -->
+        <div class="hero-bg-circle" style="width: 500px; height: 500px; top: -100px; left: -100px;"></div>
+        <div class="hero-bg-circle" style="width: 300px; height: 300px; bottom: 50px; right: 50px;"></div>
+
+        <div class="container hero-content">
+            <h1 class="hero-title">Bem-vindo ao Futuro da Manutenção</h1>
+            <p class="hero-subtitle">
+                Otimize a gestão do seu parque de máquinas com inteligência artificial, controle preditivo e relatórios estratégicos em tempo real.
+            </p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.cadastro') }}" class="btn btn-landing-primary">
+                    Criar Conta
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-landing-outline">
+                    Fazer Login
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Sobre -->
+    <section class="about-section">
+        <div class="container">
+            <h2 class="section-title">Sobre o Sistema</h2>
+            <div class="about-text">
+                <p>
+                    O <strong>ManutFlow</strong> nasceu da necessidade de simplificar e modernizar o controle de manutenção industrial. Criado por especialistas em tecnologia e gestão, nosso objetivo é eliminar planilhas complexas e processos manuais.
+                </p>
+                <p>
+                    Utilizamos o poder da Inteligência Artificial (Llama 3 via Groq) para analisar seus dados e sugerir ações preventivas antes que as falhas ocorram. Com uma interface intuitiva e recursos avançados, o ManutFlow empodera gestores a tomarem decisões baseadas em dados, reduzindo custos e aumentando a disponibilidade dos equipamentos.
+                </p>
+                <div class="row mt-5 text-center">
+                    <div class="col-md-4 mb-4">
+                        <i class="bi bi-speedometer2 display-4 text-primary mb-3"></i>
+                        <h4>Alta Performance</h4>
+                        <p class="small text-muted">Sistema leve e rápido.</p>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <i class="bi bi-cpu display-4 text-primary mb-3"></i>
+                        <h4>IA Integrada</h4>
+                        <p class="small text-muted">Análises preditivas automáticas.</p>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <i class="bi bi-shield-check display-4 text-primary mb-3"></i>
+                        <h4>Segurança</h4>
+                        <p class="small text-muted">Controle de acesso robusto.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Contatos -->
+    <section class="contact-section">
+        <div class="container">
+            <h2 class="section-title text-white">Fale Conosco</h2>
+            <p class="opacity-75">Estamos prontos para transformar sua gestão.</p>
+            
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <div class="contact-icon-wrapper">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <a href="mailto:contato@manutflow.com" class="contact-link">contato@manutflow.com</a>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon-wrapper">
+                        <i class="bi bi-whatsapp"></i>
+                    </div>
+                    <a href="https://wa.me/5511999999999" class="contact-link" target="_blank">(11) 99999-9999</a>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon-wrapper">
+                        <i class="bi bi-linkedin"></i>
+                    </div>
+                    <a href="https://linkedin.com" class="contact-link" target="_blank">LinkedIn ManutFlow</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p class="mb-0 small opacity-50">ManutFlow &copy; 2026 - Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
