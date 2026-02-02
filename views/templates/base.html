@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/logo_aguia.png') }}" type="image/x-icon">
 
+    <link rel="icon" href="{{ url_for('static', filename='img/logo_aguia.png') }}" type="image/x-icon">
+
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -53,11 +55,13 @@
                             </a>
                         </li>
                         {% if current_user.is_authenticated and current_user.is_admin %}
+                        {% if current_user.is_authenticated and current_user.is_admin %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('ia.dashboard_ia') }}">
                                 <i class="bi bi-cpu"></i> Análise IA
                             </a>
                         </li>
+                        {% endif %}
                         {% endif %}
                         
                         {% if current_user.is_authenticated and current_user.is_admin %}
