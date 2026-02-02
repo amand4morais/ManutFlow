@@ -79,7 +79,9 @@
         {% else %}
             <div class="alert alert-info">
                 <i class="bi bi-info-circle"></i> Nenhum equipamento cadastrado ainda.
+                {% if current_user.is_authenticated and current_user.is_admin %}
                 <a href="{{ url_for('equipamento.novo_equipamento') }}" class="alert-link">Cadastrar primeiro equipamento</a>
+                {% endif %}
             </div>
         {% endif %}
     </div>
