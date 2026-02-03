@@ -3,73 +3,98 @@
 {% block title %}Meu Perfil - ManutFlow{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-4">
+<div class="row mb-5 align-items-center animate-fade-in">
+    <div class="col-md-12">
+        <h1 class="display-5 fw-800 text-primary mb-1">
+            <i class="bi bi-person-bounding-box me-2"></i> Meu Perfil
+        </h1>
+        <p class="lead text-muted">Gerencie suas informações e acompanhe suas atividades.</p>
+    </div>
+</div>
+
+<div class="row g-4 animate-fade-in">
+    <div class="col-lg-4">
         <!-- Card de Informações do Perfil -->
-        <div class="card mb-4 border-0 shadow-sm">
-            <div class="card-body text-center py-5">
+        <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+            <div class="bg-primary py-4"></div>
+            <div class="card-body text-center pt-0" style="margin-top: -40px;">
                 <div class="mb-3">
-                    <i class="bi bi-person-circle display-1 text-primary"></i>
+                    <div class="bg-white rounded-circle d-inline-block p-1 shadow-sm">
+                        <i class="bi bi-person-circle display-1 text-primary"></i>
+                    </div>
                 </div>
-                <h3 class="fw-bold mb-1">{{ current_user.nome }}</h3>
-                <p class="text-muted mb-3">{{ current_user.email }}</p>
-                <div class="badge bg-{{ 'primary' if current_user.is_admin else 'secondary' }} mb-4">
-                    {{ 'Administrador' if current_user.is_admin else 'Funcionário' }}
-                </div>
-                <div class="d-grid gap-2">
-                    <a href="{{ url_for('auth.configuracoes') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-gear"></i> Configurações
+                <h3 class="fw-800 mb-1">{{ current_user.nome }}</h3>
+                <p class="text-muted mb-3 fw-500">{{ current_user.email }}</p>
+                <span class="badge bg-{{ 'primary' if current_user.is_admin else 'secondary' }}-subtle text-{{ 'primary' if current_user.is_admin else 'secondary' }} border border-{{ 'primary' if current_user.is_admin else 'secondary' }} px-3 py-2 rounded-pill mb-4">
+                    {{ 'Administrador do Sistema' if current_user.is_admin else 'Colaborador Técnico' }}
+                </span>
+                
+                <div class="d-grid gap-2 px-3">
+                    <a href="{{ url_for('auth.configuracoes_perfil') }}" class="btn btn-outline-primary rounded-pill fw-600">
+                        <i class="bi bi-gear-fill me-2"></i> Configurações da Conta
                     </a>
+                </div>
+            </div>
+            <div class="card-footer bg-light border-0 p-4">
+                <div class="row text-center">
+                    <div class="col-6 border-end">
+                        <h5 class="fw-bold mb-0">{{ equipamentos|length }}</h5>
+                        <small class="text-muted text-uppercase fw-600" style="font-size: 0.65rem;">Ativos</small>
+                    </div>
+                    <div class="col-6">
+                        <h5 class="fw-bold mb-0">{{ manutencoes|length }}</h5>
+                        <small class="text-muted text-uppercase fw-600" style="font-size: 0.65rem;">Registros</small>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <!-- Abas para Equipamentos e Manutenções -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-0 pt-4">
-                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <ul class="nav nav-pills custom-pills mb-0" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="pills-equipamentos-tab" data-bs-toggle="pill" data-bs-target="#pills-equipamentos" type="button" role="tab">
-                            <i class="bi bi-gear"></i> Meus Equipamentos
+                        <button class="nav-link active px-4 rounded-pill fw-600" id="pills-equipamentos-tab" data-bs-toggle="pill" data-bs-target="#pills-equipamentos" type="button" role="tab">
+                            <i class="bi bi-pc-display me-2"></i> Meus Ativos
                         </button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pills-manutencoes-tab" data-bs-toggle="pill" data-bs-target="#pills-manutencoes" type="button" role="tab">
-                            <i class="bi bi-wrench"></i> Minhas Manutenções
+                    <li class="nav-item ms-2" role="presentation">
+                        <button class="nav-link px-4 rounded-pill fw-600" id="pills-manutencoes-tab" data-bs-toggle="pill" data-bs-target="#pills-manutencoes" type="button" role="tab">
+                            <i class="bi bi-tools me-2"></i> Meus Registros
                         </button>
                     </li>
                 </ul>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0 mt-3">
                 <div class="tab-content" id="pills-tabContent">
                     <!-- Aba Equipamentos -->
                     <div class="tab-pane fade show active" id="pills-equipamentos" role="tabpanel">
                         {% if equipamentos %}
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
                                         <tr>
-                                            <th>Código</th>
-                                            <th>Nome</th>
+                                            <th class="ps-4">Código</th>
+                                            <th>Equipamento</th>
                                             <th>Status</th>
-                                            <th>Ações</th>
+                                            <th class="text-center pe-4">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for eq in equipamentos %}
                                         <tr>
-                                            <td><span class="badge bg-light text-dark border">{{ eq.codigo }}</span></td>
+                                            <td class="ps-4"><code>{{ eq.codigo }}</code></td>
                                             <td class="fw-bold">{{ eq.nome }}</td>
                                             <td>
-                                                <span class="badge bg-{{ eq.get_status_color() }}">
+                                                <span class="badge bg-{{ eq.get_status_color() }}-subtle text-{{ eq.get_status_color() }} border border-{{ eq.get_status_color() }}">
                                                     {{ eq.get_status_label() }}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=eq.id) }}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-eye"></i>
+                                            <td class="text-center pe-4">
+                                                <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=eq.id) }}" class="btn btn-sm btn-light border rounded-circle">
+                                                    <i class="bi bi-search text-primary"></i>
                                                 </a>
                                             </td>
                                         </tr>
@@ -79,38 +104,38 @@
                             </div>
                         {% else %}
                             <div class="text-center py-5">
-                                <i class="bi bi-info-circle display-4 text-muted"></i>
-                                <p class="mt-3 text-muted">Você não é responsável por nenhum equipamento no momento.</p>
+                                <i class="bi bi-inbox fs-1 text-muted opacity-25"></i>
+                                <p class="mt-3 text-muted">Nenhum equipamento vinculado ao seu perfil.</p>
                             </div>
                         {% endif %}
                     </div>
-
+	
                     <!-- Aba Manutenções -->
                     <div class="tab-pane fade" id="pills-manutencoes" role="tabpanel">
                         {% if manutencoes %}
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
                                         <tr>
-                                            <th>Data</th>
+                                            <th class="ps-4">Data</th>
                                             <th>Equipamento</th>
                                             <th>Tipo</th>
-                                            <th>Ações</th>
+                                            <th class="text-center pe-4">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for m in manutencoes %}
                                         <tr>
-                                            <td>{{ m.data_manutencao.strftime('%d/%m/%Y') }}</td>
+                                            <td class="ps-4 fw-bold">{{ m.data_manutencao.strftime('%d/%m/%Y') }}</td>
                                             <td>{{ m.equipamento.nome }}</td>
                                             <td>
-                                                <span class="badge bg-{{ m.get_tipo_color() }}">
+                                                <span class="badge bg-{{ m.get_tipo_color() }}-subtle text-{{ m.get_tipo_color() }} border border-{{ m.get_tipo_color() }}">
                                                     {{ m.get_tipo_label() }}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <a href="{{ url_for('manutencao.detalhe_manutencao', manutencao_id=m.id) }}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-eye"></i>
+                                            <td class="text-center pe-4">
+                                                <a href="{{ url_for('manutencao.detalhe_manutencao', manutencao_id=m.id) }}" class="btn btn-sm btn-light border rounded-circle">
+                                                    <i class="bi bi-search text-primary"></i>
                                                 </a>
                                             </td>
                                         </tr>
@@ -120,8 +145,8 @@
                             </div>
                         {% else %}
                             <div class="text-center py-5">
-                                <i class="bi bi-info-circle display-4 text-muted"></i>
-                                <p class="mt-3 text-muted">Você ainda não cadastrou nenhuma manutenção.</p>
+                                <i class="bi bi-clipboard-x fs-1 text-muted opacity-25"></i>
+                                <p class="mt-3 text-muted">Você ainda não registrou nenhuma manutenção.</p>
                             </div>
                         {% endif %}
                     </div>
@@ -130,4 +155,20 @@
         </div>
     </div>
 </div>
+
+<style>
+    .fw-500 { font-weight: 500; }
+    .fw-600 { font-weight: 600; }
+    .fw-800 { font-weight: 800; }
+    .custom-pills .nav-link {
+        color: var(--text-muted);
+        background: transparent;
+        border: 1px solid transparent;
+    }
+    .custom-pills .nav-link.active {
+        color: var(--primary-color);
+        background: var(--bg-body);
+        border-color: var(--primary-color);
+    }
+</style>
 {% endblock %}

@@ -5,77 +5,79 @@
 {% block body_class %}auth-body{% endblock %}
 
 {% block layout %}
-<div class="auth-container">
-    <!-- Lado Esquerdo -->
-    <div class="auth-side-welcome">
-        <a href="{{ url_for('auth.login') }}" class="back-home"><i class="bi bi-arrow-left"></i> Voltar ao Login</a>
+<div class="auth-container animate-fade-in">
+    <!-- Lado Esquerdo: Branding -->
+    <div class="auth-side-welcome d-none d-lg-flex">
+        <a href="{{ url_for('auth.login') }}" class="back-home text-white text-decoration-none mb-5">
+            <i class="bi bi-arrow-left me-2"></i> Voltar ao Login
+        </a>
         
-        <div class="text-start">
-            <h1>RECUPERAR<br>SENHA</h1>
-            <p>Redefina suas credenciais para recuperar o acesso ao sistema de gestão ManutFlow.</p>
+        <div class="mt-auto">
+            <img src="{{ url_for('static', filename='img/logo_aguia.png') }}" alt="Logo" width="80" class="mb-4">
+            <h1 class="display-3 fw-800">RECUPERAR<br>ACESSO</h1>
+            <p class="lead opacity-75 mt-4">
+                Redefina suas credenciais para recuperar o acesso ao sistema de gestão ManutFlow de forma segura.
+            </p>
+        </div>
+        
+        <div class="mt-auto small opacity-50">
+            ManutFlow &copy; 2026 - Gestão de Ativos
         </div>
     </div>
 
-    <!-- Lado Direito (Form) -->
+    <!-- Lado Direito: Formulário de Recuperação -->
     <div class="auth-side-form">
-        <div class="auth-box">
-            <!-- Flash Messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show small" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <div class="auth-header">
-                <h2>Redefinir</h2>
+        <div class="auth-box py-4">
+            <div class="text-center mb-4 d-lg-none">
+                <img src="{{ url_for('static', filename='img/logo_aguia.png') }}" alt="Logo" width="60" class="mb-3">
+                <h2 class="fw-800 text-primary">ManutFlow</h2>
             </div>
 
-            <form method="POST" action="{{ url_for('auth.recuperar_senha') }}">
-                <div class="auth-input-group">
-                    <label class="auth-label">Seu E-mail Cadastrado</label>
-                    <input type="email" name="email" class="auth-input" required>
-                    <i class="bi bi-envelope auth-icon"></i>
+            <div class="auth-header mb-4">
+                <h2 class="fw-800 h1">Redefinir Senha</h2>
+                <p class="text-muted">Informe seu e-mail e escolha sua nova senha de acesso.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.recuperar_senha') }}" class="needs-validation" novalidate>
+                <div class="auth-input-group mb-3">
+                    <label class="form-label fw-600 small text-muted text-uppercase">E-mail Cadastrado</label>
+                    <div class="position-relative">
+                        <input type="email" name="email" class="auth-input" placeholder="seu-email@empresa.com" required>
+                        <i class="bi bi-envelope auth-icon"></i>
+                    </div>
                 </div>
 
-                <div class="auth-input-group">
-                    <label class="auth-label">Nova Senha</label>
-                    <input type="password" name="nova_senha" id="nova_senha" class="auth-input" required>
-                    <i class="bi bi-eye-slash auth-icon password-toggle" onclick="togglePassword('nova_senha', this)"></i>
+                <div class="auth-input-group mb-3">
+                    <label class="form-label fw-600 small text-muted text-uppercase">Nova Senha</label>
+                    <div class="position-relative">
+                        <input type="password" name="nova_senha" id="nova_senha" class="auth-input" placeholder="••••••••" required>
+                        <i class="bi bi-eye-slash auth-icon cursor-pointer" onclick="togglePassword('nova_senha', this)"></i>
+                    </div>
                 </div>
 
-                <div class="auth-input-group">
-                    <label class="auth-label">Confirmar Nova Senha</label>
-                    <input type="password" name="confirmar_senha" id="confirmar_senha" class="auth-input" required>
-                    <i class="bi bi-eye-slash auth-icon password-toggle" onclick="togglePassword('confirmar_senha', this)"></i>
+                <div class="auth-input-group mb-4">
+                    <label class="form-label fw-600 small text-muted text-uppercase">Confirmar Nova Senha</label>
+                    <div class="position-relative">
+                        <input type="password" name="confirmar_senha" id="confirmar_senha" class="auth-input" placeholder="••••••••" required>
+                        <i class="bi bi-shield-lock auth-icon"></i>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-auth">Alterar Senha</button>
+                <button type="submit" class="btn btn-auth shadow-sm">
+                    Atualizar Senha <i class="bi bi-check-lg ms-2"></i>
+                </button>
             </form>
 
-            <div class="auth-footer">
-                Lembrou sua senha? <a href="{{ url_for('auth.login') }}">Entrar</a>
+            <div class="auth-footer mt-5">
+                <p class="text-muted">Lembrou sua senha? <a href="{{ url_for('auth.login') }}" class="text-primary fw-bold text-decoration-none">Voltar para o login</a></p>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-function togglePassword(inputId, icon) {
-    const input = document.getElementById(inputId);
-    if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("bi-eye-slash");
-        icon.classList.add("bi-eye");
-    } else {
-        input.type = "password";
-        icon.classList.remove("bi-eye");
-        icon.classList.add("bi-eye-slash");
-    }
-}
-</script>
+<style>
+    .cursor-pointer { cursor: pointer; }
+    .fw-600 { font-weight: 600; }
+    .fw-800 { font-weight: 800; }
+</style>
 {% endblock %}

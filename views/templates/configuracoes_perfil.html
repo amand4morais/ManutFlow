@@ -3,55 +3,104 @@
 {% block title %}Configurações de Perfil - ManutFlow{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-0 pt-4 text-center">
-                <h3 class="fw-bold"><i class="bi bi-gear text-primary"></i> Configurações de Perfil</h3>
-                <p class="text-muted">Atualize suas informações pessoais e senha</p>
+<div class="row mb-5 align-items-center animate-fade-in">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('auth.perfil') }}" class="text-decoration-none">Perfil</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Configurações</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-800 text-primary mb-1">
+            <i class="bi bi-shield-lock me-2"></i> Segurança e Conta
+        </h1>
+        <p class="lead text-muted">Atualize suas credenciais e preferências de acesso.</p>
+    </div>
+</div>
+
+<div class="row justify-content-center animate-fade-in">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-700 mb-0"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Dados Pessoais</h5>
             </div>
             <div class="card-body p-4">
-                <form method="POST" action="{{ url_for('auth.configuracoes') }}">
+                <form method="POST" action="{{ url_for('auth.configuracoes_perfil') }}">
                     <!-- Nome -->
                     <div class="mb-4">
-                        <label for="nome" class="form-label fw-bold text-muted small text-uppercase">Nome Completo</label>
+                        <label for="nome" class="form-label fw-600 small text-muted text-uppercase">Nome de Exibição</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-primary"></i></span>
-                            <input type="text" class="form-control bg-light border-start-0" id="nome" name="nome" value="{{ current_user.nome }}" required>
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-person text-primary"></i></span>
+                            <input type="text" class="form-control border-0 bg-light" id="nome" name="nome" value="{{ current_user.nome }}" required>
+                        </div>
+                        <div class="form-text small">Como seu nome aparecerá nos registros de manutenção.</div>
+                    </div>
+
+                    <div class="p-4 bg-light rounded-3 mb-4">
+                        <h6 class="fw-700 mb-3"><i class="bi bi-key me-2 text-warning"></i>Alterar Senha de Acesso</h6>
+                        <p class="text-muted small mb-4">Preencha os campos abaixo apenas se desejar mudar sua senha atual.</p>
+
+                        <!-- Nova Senha -->
+                        <div class="mb-3">
+                            <label for="nova_senha" class="form-label fw-600 small text-muted text-uppercase">Nova Senha</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-0"><i class="bi bi-lock text-primary"></i></span>
+                                <input type="password" class="form-control border-0 bg-white" id="nova_senha" name="nova_senha" placeholder="Mínimo 6 caracteres">
+                            </div>
+                        </div>
+
+                        <!-- Confirmar Senha -->
+                        <div class="mb-0">
+                            <label for="confirmar_senha" class="form-label fw-600 small text-muted text-uppercase">Confirmar Nova Senha</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-0"><i class="bi bi-check2-circle text-primary"></i></span>
+                                <input type="password" class="form-control border-0 bg-white" id="confirmar_senha" name="confirmar_senha" placeholder="Repita a nova senha">
+                            </div>
                         </div>
                     </div>
 
-                    <hr class="my-4 opacity-25">
-                    <h5 class="mb-3 fw-bold">Alterar Senha</h5>
-                    <p class="text-muted small mb-4">Deixe em branco caso não deseje alterar a senha atual.</p>
-
-                    <!-- Nova Senha -->
-                    <div class="mb-3">
-                        <label for="nova_senha" class="form-label fw-bold text-muted small text-uppercase">Nova Senha</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-primary"></i></span>
-                            <input type="password" class="form-control bg-light border-start-0" id="nova_senha" name="nova_senha" placeholder="Mínimo 6 caracteres">
-                        </div>
-                    </div>
-
-                    <!-- Confirmar Senha -->
-                    <div class="mb-4">
-                        <label for="confirmar_senha" class="form-label fw-bold text-muted small text-uppercase">Confirmar Nova Senha</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-check-circle text-primary"></i></span>
-                            <input type="password" class="form-control bg-light border-start-0" id="confirmar_senha" name="confirmar_senha" placeholder="Repita a nova senha">
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-2 mt-5">
-                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
-                            <i class="bi bi-save"></i> Salvar Alterações
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{{ url_for('auth.perfil') }}" class="btn btn-light border rounded-pill px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">
+                            <i class="bi bi-check-lg me-1"></i> Salvar Alterações
                         </button>
-                        <a href="{{ url_for('auth.perfil') }}" class="btn btn-link text-muted">Cancelar</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm bg-primary bg-opacity-10 mb-4">
+            <div class="card-body p-4">
+                <h6 class="fw-700 text-primary mb-3">Informações da Conta</h6>
+                <div class="mb-3">
+                    <label class="small text-muted d-block">E-mail de Login</label>
+                    <span class="fw-bold">{{ current_user.email }}</span>
+                </div>
+                <div class="mb-3">
+                    <label class="small text-muted d-block">Nível de Acesso</label>
+                    <span class="badge bg-primary rounded-pill px-3">{{ 'Administrador' if current_user.is_admin else 'Funcionário' }}</span>
+                </div>
+                <div class="mb-0">
+                    <label class="small text-muted d-block">Membro desde</label>
+                    <span class="fw-bold">{{ current_user.data_criacao.strftime('%d/%m/%Y') if current_user.data_criacao else 'N/A' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h6 class="fw-700 mb-3 text-danger"><i class="bi bi-shield-exclamation me-2"></i>Privacidade</h6>
+                <p class="small text-muted mb-0">Suas credenciais são criptografadas e protegidas. Nunca compartilhe sua senha com terceiros.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .fw-600 { font-weight: 600; }
+    .fw-700 { font-weight: 700; }
+    .fw-800 { font-weight: 800; }
+</style>
 {% endblock %}

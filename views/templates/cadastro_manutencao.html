@@ -1,74 +1,85 @@
 {% extends "base.html" %}
 
-{% block title %}{% if manutencao %}Editar{% else %}Nova{% endif %} Manutenção - Sistema de Manutenção{% endblock %}
+{% block title %}{% if manutencao %}Editar{% else %}Nova{% endif %} Manutenção - ManutFlow{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h1 class="display-4">
-            <i class="bi bi-{% if manutencao %}pencil{% else %}plus-circle{% endif %}"></i> 
-            {% if manutencao %}Editar{% else %}Nova{% endif %} Manutenção
+<div class="row mb-5 align-items-center animate-fade-in">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('manutencao.listar_manutencoes') }}" class="text-decoration-none">Manutenções</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{% if manutencao %}Editar{% else %}Nova{% endif %}</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-800 text-primary mb-1">
+            <i class="bi bi-{% if manutencao %}pencil-square{% else %}plus-circle-fill{% endif %} me-2"></i> 
+            {% if manutencao %}Editar{% else %}Registrar{% endif %} Manutenção
         </h1>
+        <p class="lead text-muted">{% if manutencao %}Atualize os detalhes da intervenção técnica.{% else %}Registre um novo serviço realizado em um equipamento.{% endif %}</p>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="equipamento_id" class="form-label">Equipamento *</label>
-                        <select class="form-select" id="equipamento_id" name="equipamento_id" required>
-                            <option value="">Selecione um equipamento</option>
-                            {% for eq in equipamentos %}
-                            <option value="{{ eq.id }}" 
-                                    {% if manutencao and manutencao.equipamento_id == eq.id %}selected{% endif %}>
-                                {{ eq.codigo }} - {{ eq.nome }} ({{ eq.setor }})
-                            </option>
-                            {% endfor %}
-                        </select>
+<div class="row g-4 animate-fade-in">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="equipamento_id" class="form-label fw-600 small text-muted text-uppercase">Equipamento *</label>
+                            <select class="form-select" id="equipamento_id" name="equipamento_id" required>
+                                <option value="" disabled {% if not manutencao %}selected{% endif %}>Selecione um equipamento...</option>
+                                {% for eq in equipamentos %}
+                                <option value="{{ eq.id }}" 
+                                        {% if manutencao and manutencao.equipamento_id == eq.id %}selected{% endif %}>
+                                    {{ eq.codigo }} - {{ eq.nome }} ({{ eq.setor_rel.nome if eq.setor_rel else "N/A" }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="tipo" class="form-label fw-600 small text-muted text-uppercase">Tipo de Intervenção *</label>
+                            <select class="form-select" id="tipo" name="tipo" required>
+                                <option value="preventiva" {% if manutencao and manutencao.tipo == 'preventiva' %}selected{% endif %}>
+                                    🛡️ Preventiva
+                                </option>
+                                <option value="corretiva" {% if manutencao and manutencao.tipo == 'corretiva' %}selected{% endif %}>
+                                    🛠️ Corretiva
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="data_manutencao" class="form-label fw-600 small text-muted text-uppercase">Data da Realização *</label>
+                            <input type="date" class="form-control" id="data_manutencao" name="data_manutencao" 
+                                   value="{% if manutencao %}{{ manutencao.data_manutencao.strftime('%Y-%m-%d') }}{% endif %}" 
+                                   required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="descricao" class="form-label fw-600 small text-muted text-uppercase">Descrição Detalhada *</label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="5" required placeholder="Descreva as peças trocadas, serviços realizados e observações técnicas...">{% if manutencao %}{{ manutencao.descricao }}{% endif %}</textarea>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="custo" class="form-label fw-600 small text-muted text-uppercase">Custo Total (R$)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">R$</span>
+                                <input type="number" class="form-control" id="custo" name="custo" 
+                                       step="0.01" min="0" 
+                                       value="{% if manutencao %}{{ manutencao.custo }}{% else %}0{% endif %}">
+                            </div>
+                            <div class="form-text small">Inclua custos de peças e mão de obra externa se houver.</div>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="tipo" class="form-label">Tipo de Manutenção *</label>
-                        <select class="form-select" id="tipo" name="tipo" required>
-                            <option value="preventiva" {% if manutencao and manutencao.tipo == 'preventiva' %}selected{% endif %}>
-                                Preventiva
-                            </option>
-                            <option value="corretiva" {% if manutencao and manutencao.tipo == 'corretiva' %}selected{% endif %}>
-                                Corretiva
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="data_manutencao" class="form-label">Data da Manutenção *</label>
-                        <input type="date" class="form-control" id="data_manutencao" name="data_manutencao" 
-                               value="{% if manutencao %}{{ manutencao.data_manutencao.strftime('%Y-%m-%d') }}{% endif %}" 
-                               required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="descricao" class="form-label">Descrição *</label>
-                        <textarea class="form-control" id="descricao" name="descricao" rows="5" required>{% if manutencao %}{{ manutencao.descricao }}{% endif %}</textarea>
-                        <div class="form-text">Descreva detalhadamente o serviço realizado</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="custo" class="form-label">Custo (R$)</label>
-                        <input type="number" class="form-control" id="custo" name="custo" 
-                               step="0.01" min="0" 
-                               value="{% if manutencao %}{{ manutencao.custo }}{% else %}0{% endif %}">
-                        <div class="form-text">Valor total gasto com a manutenção</div>
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('manutencao.listar_manutencoes') }}" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancelar
+                    <div class="d-flex justify-content-end gap-2 mt-5">
+                        <a href="{{ url_for('manutencao.listar_manutencoes') }}" class="btn btn-light border rounded-pill px-4">
+                            Cancelar
                         </a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> {% if manutencao %}Atualizar{% else %}Registrar{% endif %}
+                        <button type="submit" class="btn btn-success rounded-pill px-5 shadow-sm">
+                            <i class="bi bi-check-lg me-1"></i> {% if manutencao %}Salvar Alterações{% else %}Registrar Serviço{% endif %}
                         </button>
                     </div>
                 </form>
@@ -76,27 +87,38 @@
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card bg-light">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-info-circle"></i> Informações
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm bg-success bg-opacity-10">
+            <div class="card-body p-4">
+                <h5 class="fw-700 text-success mb-3">
+                    <i class="bi bi-info-circle-fill me-2"></i>Informações
                 </h5>
-                <p class="card-text">
-                    Preencha todos os campos obrigatórios (*) para {% if manutencao %}atualizar{% else %}registrar{% endif %} a manutenção.
+                <p class="small text-muted mb-4">
+                    O registro preciso das manutenções é fundamental para o cálculo do tempo médio entre falhas (MTBF) e custo total de propriedade (TCO).
                 </p>
-                <hr>
-                <h6>Tipos de Manutenção:</h6>
-                <ul class="small">
-                    <li><strong>Preventiva:</strong> Manutenção planejada para prevenir falhas</li>
-                    <li><strong>Corretiva:</strong> Manutenção para corrigir falhas já ocorridas</li>
-                </ul>
-                <hr>
-                <p class="small text-muted">
-                    <i class="bi bi-lightbulb"></i> Dica: Registre manutenções preventivas regularmente para reduzir custos com manutenções corretivas.
-                </p>
+                
+                <div class="mb-4">
+                    <h6 class="fw-600 small text-uppercase text-muted mb-2">Tipos:</h6>
+                    <div class="small">
+                        <p class="mb-1"><strong>Preventiva:</strong> Planejada para evitar quebras e estender a vida útil.</p>
+                        <p class="mb-0"><strong>Corretiva:</strong> Realizada após uma falha ou parada inesperada.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white bg-opacity-50 p-3 rounded-3 border border-success border-opacity-25">
+                    <p class="small text-muted mb-0 italic">
+                        <i class="bi bi-lightbulb-fill text-warning me-1"></i>
+                        <strong>Dica:</strong> Manutenções preventivas regulares podem reduzir custos operacionais em até 30%.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .fw-600 { font-weight: 600; }
+    .fw-700 { font-weight: 700; }
+    .fw-800 { font-weight: 800; }
+</style>
 {% endblock %}

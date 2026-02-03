@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}Análise IA - Sistema de Manutenção{% endblock %}
+{% block title %}Análise IA - ManutFlow{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h1 class="display-4">
-            <i class="bi bi-cpu"></i> Análise Inteligente
+<div class="row mb-5 align-items-center animate-fade-in">
+    <div class="col-md-8">
+        <h1 class="display-5 fw-800 text-primary mb-1">
+            <i class="bi bi-cpu me-2"></i> Análise Inteligente
         </h1>
-        <p class="lead">Insights e recomendações geradas por IA</p>
+        <p class="lead text-muted">Insights preditivos e recomendações estratégicas via IA.</p>
     </div>
 </div>
 
-<!-- Filtros de Data -->
-<div class="card mb-4">
-    <div class="card-header bg-light">
-        <i class="bi bi-funnel"></i> Filtros de Período para Análise
+<!-- Filtros de Data Modernos -->
+<div class="card border-0 shadow-sm mb-5 animate-fade-in">
+    <div class="card-header bg-transparent border-0 pt-4 px-4">
+        <h6 class="fw-700 mb-0 text-primary"><i class="bi bi-filter-right me-2"></i>Parâmetros de Análise</h6>
     </div>
-    <div class="card-body">
+    <div class="card-body p-4">
         <form method="GET" action="{{ url_for('ia.dashboard_ia') }}" id="formFiltro" class="row g-3 align-items-end">
             <div class="col-md-3">
-                <label for="filtro_pre" class="form-label">Período Pré-definido</label>
-                <select class="form-select" id="filtro_pre" name="filtro_pre" onchange="aplicarPredefinicao(this.value)">
+                <label for="filtro_pre" class="form-label small fw-600 text-muted">Período de Dados</label>
+                <select class="form-select border-0 bg-light" id="filtro_pre" name="filtro_pre" onchange="aplicarPredefinicao(this.value)">
                     <option value="" {% if not filtro_pre %}selected{% endif %}>Personalizado</option>
                     <option value="mes_atual" {% if filtro_pre == 'mes_atual' %}selected{% endif %}>Mês Atual</option>
                     <option value="ultimos_3_meses" {% if filtro_pre == 'ultimos_3_meses' %}selected{% endif %}>Últimos 3 Meses</option>
@@ -30,20 +30,20 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label for="data_inicio" class="form-label">Data Início</label>
-                <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ data_inicio or '' }}">
+                <label for="data_inicio" class="form-label small fw-600 text-muted">Data Inicial</label>
+                <input type="date" class="form-control border-0 bg-light" id="data_inicio" name="data_inicio" value="{{ data_inicio or '' }}">
             </div>
             <div class="col-md-3">
-                <label for="data_fim" class="form-label">Data Fim</label>
-                <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ data_fim or '' }}">
+                <label for="data_fim" class="form-label small fw-600 text-muted">Data Final</label>
+                <input type="date" class="form-control border-0 bg-light" id="data_fim" name="data_fim" value="{{ data_fim or '' }}">
             </div>
             <div class="col-md-3">
-                <div class="d-grid gap-2 d-md-flex">
-                    <button type="submit" class="btn btn-primary flex-grow-1">
-                        <i class="bi bi-arrow-clockwise"></i> Analisar
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1 rounded-pill shadow-sm">
+                        <i class="bi bi-lightning-charge me-1"></i> Analisar
                     </button>
-                    <a href="{{ url_for('ia.dashboard_ia') }}" class="btn btn-outline-secondary" title="Limpar Filtros">
-                        <i class="bi bi-x-lg"></i>
+                    <a href="{{ url_for('ia.dashboard_ia') }}" class="btn btn-light border rounded-circle" title="Limpar Filtros">
+                        <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
                 </div>
             </div>
@@ -51,195 +51,147 @@
     </div>
 </div>
 
-{% if data_inicio or data_fim %}
-<div class="alert alert-info mb-4">
-    <i class="bi bi-info-circle-fill"></i> Visualizando análise para o período: 
-    <strong>{{ data_inicio if data_inicio else 'Início' }}</strong> até <strong>{{ data_fim if data_fim else 'Hoje' }}</strong>.
-</div>
-{% endif %}
-
-<!-- Estatísticas Gerais -->
-<div class="row mb-4">
+<!-- Estatísticas Gerais Modernas -->
+<div class="row mb-5 g-4 animate-fade-in">
     <div class="col-md-3">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h6 class="card-title">Total de Equipamentos</h6>
-                <h2 class="card-text">{{ dados.estatisticas_gerais.total_equipamentos }}</h2>
-            </div>
+        <div class="card border-0 shadow-sm bg-primary text-white text-center p-3">
+            <small class="opacity-75 text-uppercase fw-600">Total Ativos</small>
+            <h2 class="fw-800 mb-0">{{ dados.estatisticas_gerais.total_equipamentos }}</h2>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h6 class="card-title">Equipamentos Ativos</h6>
-                <h2 class="card-text">{{ dados.estatisticas_gerais.equipamentos_ativos }}</h2>
-            </div>
+        <div class="card border-0 shadow-sm bg-success text-white text-center p-3">
+            <small class="opacity-75 text-uppercase fw-600">Operacionais</small>
+            <h2 class="fw-800 mb-0">{{ dados.estatisticas_gerais.equipamentos_ativos }}</h2>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-danger">
-            <div class="card-body">
-                <h6 class="card-title">Em Manutenção</h6>
-                <h2 class="card-text">{{ dados.estatisticas_gerais.equipamentos_em_manutencao }}</h2>
-            </div>
+        <div class="card border-0 shadow-sm bg-danger text-white text-center p-3">
+            <small class="opacity-75 text-uppercase fw-600">Parados</small>
+            <h2 class="fw-800 mb-0">{{ dados.estatisticas_gerais.equipamentos_em_manutencao }}</h2>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card text-white bg-warning">
-            <div class="card-body">
-                <h6 class="card-title">Custo no Período</h6>
-                <h2 class="card-text">R$ {{ "%.2f"|format(dados.estatisticas_gerais.custo_total) }}</h2>
-            </div>
+        <div class="card border-0 shadow-sm bg-warning text-dark text-center p-3">
+            <small class="opacity-75 text-uppercase fw-600">Custo Período</small>
+            <h2 class="fw-800 mb-0">R$ {{ "%.0f"|format(dados.estatisticas_gerais.custo_total) }}</h2>
         </div>
     </div>
 </div>
 
-<!-- Resumo da Saúde -->
-<div class="card mb-4">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">
-            <i class="bi bi-heart-pulse"></i> Resumo da Saúde dos Equipamentos
-        </h5>
-    </div>
-    <div class="card-body">
-        {% if analise.resumo_saude %}
-            <p class="card-text" style="white-space: pre-wrap;">{{ analise.resumo_saude }}</p>
-        {% else %}
-            <div class="alert alert-warning">
-                Não foi possível gerar a análise. Verifique se há dados suficientes no período selecionado.
+<div class="row g-4 mb-5 animate-fade-in">
+    <!-- Resumo da Saúde -->
+    <div class="col-lg-12">
+        <div class="card border-0 shadow-sm border-start border-primary border-4">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-700 mb-0"><i class="bi bi-heart-pulse me-2 text-primary"></i>Diagnóstico de Saúde Operacional</h5>
             </div>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Equipamentos Críticos -->
-<div class="card mb-4">
-    <div class="card-header bg-danger text-white">
-        <h5 class="mb-0">
-            <i class="bi bi-exclamation-triangle"></i> Equipamentos Críticos (Prioridades)
-        </h5>
-    </div>
-    <div class="card-body">
-        {% if analise.equipamentos_criticos %}
-            <div class="list-group">
-                {% for eq in analise.equipamentos_criticos %}
-                <div class="list-group-item">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h6 class="mb-1">
-                            <strong>{{ eq.codigo }}</strong> - {{ eq.nome }}
-                        </h6>
-                        <span class="badge bg-{% if eq.prioridade == 'alta' %}danger{% elif eq.prioridade == 'média' %}warning{% else %}info{% endif %}">
-                            Prioridade {{ eq.prioridade|capitalize }}
-                        </span>
+            <div class="card-body p-4">
+                {% if analise.resumo_saude %}
+                    <p class="lead text-muted mb-0" style="white-space: pre-wrap;">{{ analise.resumo_saude }}</p>
+                {% else %}
+                    <div class="alert alert-warning border-0 shadow-sm">
+                        <i class="bi bi-exclamation-triangle me-2"></i> Não foi possível gerar a análise. Verifique se há dados suficientes no período.
                     </div>
-                    <p class="mb-1">{{ eq.justificativa }}</p>
-                </div>
-                {% endfor %}
+                {% endif %}
             </div>
-        {% else %}
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> Nenhum equipamento crítico identificado no momento.
-            </div>
-        {% endif %}
+        </div>
     </div>
-</div>
 
-<!-- Análise por Setor -->
-<div class="card mb-4">
-    <div class="card-header bg-info text-white">
-        <h5 class="mb-0">
-            <i class="bi bi-building"></i> Análise por Setor
-        </h5>
-    </div>
-    <div class="card-body">
-        {% if analise.analise_setores %}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Setor</th>
-                            <th>Custo Total</th>
-                            <th>Recomendação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for setor in analise.analise_setores %}
-                        <tr>
-                            <td><strong>{{ setor.setor }}</strong></td>
-                            <td>R$ {{ "%.2f"|format(setor.custo_total) }}</td>
-                            <td>{{ setor.recomendacao }}</td>
-                        </tr>
+    <!-- Equipamentos Críticos -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-700 mb-0 text-danger"><i class="bi bi-exclamation-diamond me-2"></i>Prioridades de Atenção</h5>
+            </div>
+            <div class="card-body p-4">
+                {% if analise.equipamentos_criticos %}
+                    <div class="list-group list-group-flush">
+                        {% for eq in analise.equipamentos_criticos %}
+                        <div class="list-group-item bg-transparent px-0 py-3 border-0 border-bottom">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0 fw-bold"><code>{{ eq.codigo }}</code> - {{ eq.nome }}</h6>
+                                <span class="badge bg-{% if eq.prioridade == 'alta' %}danger{% elif eq.prioridade == 'média' %}warning{% else %}info{% endif %}-subtle text-{% if eq.prioridade == 'alta' %}danger{% elif eq.prioridade == 'média' %}warning{% else %}info{% endif %} border border-{% if eq.prioridade == 'alta' %}danger{% elif eq.prioridade == 'média' %}warning{% else %}info{% endif %}">
+                                    {{ eq.prioridade|upper }}
+                                </span>
+                            </div>
+                            <p class="small text-muted mb-0">{{ eq.justificativa }}</p>
+                        </div>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-check-circle fs-1 text-success opacity-25"></i>
+                        <p class="text-muted mt-2">Nenhum alerta crítico no momento.</p>
+                    </div>
+                {% endif %}
             </div>
-        {% else %}
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> Análise por setor não disponível.
-            </div>
-        {% endif %}
+        </div>
     </div>
-</div>
 
-<!-- Recomendações Estratégicas -->
-<div class="card mb-4">
-    <div class="card-header bg-success text-white">
-        <h5 class="mb-0">
-            <i class="bi bi-lightbulb"></i> Recomendações Estratégicas
-        </h5>
-    </div>
-    <div class="card-body">
-        {% if analise.recomendacoes %}
-            <ul class="list-group list-group-flush">
-                {% for rec in analise.recomendacoes %}
-                <li class="list-group-item">
-                    <i class="bi bi-check-circle text-success"></i> {{ rec }}
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> Nenhuma recomendação disponível no momento.
+    <!-- Recomendações Estratégicas -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-700 mb-0 text-success"><i class="bi bi-lightbulb me-2"></i>Plano de Ação Recomendado</h5>
             </div>
-        {% endif %}
+            <div class="card-body p-4">
+                {% if analise.recomendacoes %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for rec in analise.recomendacoes %}
+                        <div class="d-flex align-items-start bg-success bg-opacity-10 p-3 rounded-3 border border-success border-opacity-10">
+                            <i class="bi bi-check2-circle text-success fs-5 me-3"></i>
+                            <span class="small fw-500 text-dark">{{ rec }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted py-4">Aguardando dados para recomendações.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Gráficos de Estatísticas -->
-<div class="row">
+<div class="row g-4 animate-fade-in">
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Manutenções por Tipo (No Período)</h5>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h6 class="fw-700 mb-0 text-muted">Mix de Manutenções</h6>
             </div>
-            <div class="card-body">
-                <canvas id="graficoTipos"></canvas>
+            <div class="card-body p-4">
+                <canvas id="graficoTipos" style="max-height: 250px;"></canvas>
             </div>
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Status dos Equipamentos (Atual)</h5>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h6 class="fw-700 mb-0 text-muted">Saúde do Parque Ativo</h6>
             </div>
-            <div class="card-body">
-                <canvas id="graficoStatus"></canvas>
+            <div class="card-body p-4">
+                <canvas id="graficoStatus" style="max-height: 250px;"></canvas>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .fw-500 { font-weight: 500; }
+    .fw-600 { font-weight: 600; }
+    .fw-700 { font-weight: 700; }
+    .fw-800 { font-weight: 800; }
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-// Função para pré-definições de data
 function aplicarPredefinicao(valor) {
     const hoje = new Date();
     let inicio = new Date();
     let fim = new Date();
-    
-    // Zera horas para evitar problemas de fuso
     hoje.setHours(0,0,0,0);
     
     switch(valor) {
@@ -247,31 +199,27 @@ function aplicarPredefinicao(valor) {
             inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
             fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
             break;
-            
         case 'ultimos_3_meses':
             inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1);
             fim = hoje;
             break;
-            
         case 'ano_atual':
             inicio = new Date(hoje.getFullYear(), 0, 1);
             fim = new Date(hoje.getFullYear(), 11, 31);
             break;
-            
         case 'ano_passado':
             inicio = new Date(hoje.getFullYear() - 1, 0, 1);
             fim = new Date(hoje.getFullYear() - 1, 11, 31);
             break;
-            
-        default:
-            return;
+        default: return;
     }
     
-    if (valor) {
-        document.getElementById('data_inicio').value = inicio.toISOString().split('T')[0];
-        document.getElementById('data_fim').value = fim.toISOString().split('T')[0];
-    }
+    document.getElementById('data_inicio').value = inicio.toISOString().split('T')[0];
+    document.getElementById('data_fim').value = fim.toISOString().split('T')[0];
 }
+
+const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+const textColor = isDark ? '#94a3b8' : '#64748b';
 
 // Gráfico de Manutenções por Tipo
 const ctxTipos = document.getElementById('graficoTipos').getContext('2d');
@@ -284,15 +232,14 @@ new Chart(ctxTipos, {
                 {{ dados.estatisticas_gerais.manutencoes_preventivas | default(0) }},
                 {{ dados.estatisticas_gerais.manutencoes_corretivas | default(0) }}
             ],
-            backgroundColor: ['#17a2b8', '#ffc107']
+            backgroundColor: ['#242480', '#ffc107'],
+            borderWidth: 0
         }]
     },
     options: {
         responsive: true,
         plugins: {
-            legend: {
-                position: 'bottom'
-            }
+            legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true, padding: 20 } }
         }
     }
 });
@@ -309,15 +256,15 @@ new Chart(ctxStatus, {
                 {{ dados.estatisticas_gerais.equipamentos_em_manutencao | default(0) }},
                 {{ dados.estatisticas_gerais.equipamentos_sucateados | default(0) }}
             ],
-            backgroundColor: ['#28a745', '#dc3545', '#6c757d']
+            backgroundColor: ['#28a745', '#dc3545', '#94a3b8'],
+            borderWidth: 0,
+            cutout: '70%'
         }]
     },
     options: {
         responsive: true,
         plugins: {
-            legend: {
-                position: 'bottom'
-            }
+            legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true, padding: 20 } }
         }
     }
 });

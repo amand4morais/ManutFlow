@@ -1,106 +1,101 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Sistema de Manutenção{% endblock %}
+{% block title %}Dashboard - ManutFlow{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h1 class="display-4">
-            <i class="bi bi-speedometer2"></i> Dashboard
+<div class="row mb-5 animate-fade-in">
+    <div class="col-lg-8">
+        <h1 class="display-5 fw-800 text-primary">
+            Olá, {{ current_user.nome.split(' ')[0] }}!
         </h1>
-        <p class="lead">Visão geral do sistema de manutenção</p>
+        <p class="lead text-muted">Aqui está o resumo operacional do seu parque de equipamentos.</p>
     </div>
-</div>
-
-<!-- Cards de Estatísticas -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-gear-fill"></i> Total de Equipamentos
-                </h5>
-                <h2 class="card-text">{{ total_equipamentos }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-check-circle-fill"></i> Equipamentos Ativos
-                </h5>
-                <h2 class="card-text">{{ equipamentos_ativos }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-danger">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-exclamation-triangle-fill"></i> Em Manutenção
-                </h5>
-                <h2 class="card-text">{{ equipamentos_em_manutencao }}</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-wrench"></i> Total de Manutenções
-                </h5>
-                <h2 class="card-text">{{ total_manutencoes }}</h2>
-            </div>
+    <div class="col-lg-4 text-lg-end d-flex align-items-center justify-content-lg-end">
+        <div class="text-muted small">
+            <i class="bi bi-calendar3 me-1"></i> <span id="current-date"></span>
         </div>
     </div>
 </div>
 
-<!-- Status dos Equipamentos -->
-<div class="row mb-4">
+<!-- Cards de Estatísticas Modernos -->
+<div class="row mb-5 g-4 animate-fade-in">
+    <div class="col-md-3">
+        <div class="card stat-card bg-primary h-100">
+            <div class="card-body">
+                <i class="bi bi-pc-display fs-1 opacity-50 mb-3"></i>
+                <h2 class="mb-0">{{ total_equipamentos }}</h2>
+                <div class="small opacity-75">Total de Equipamentos</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card bg-success h-100">
+            <div class="card-body">
+                <i class="bi bi-check-circle-fill fs-1 opacity-50 mb-3"></i>
+                <h2 class="mb-0">{{ equipamentos_ativos }}</h2>
+                <div class="small opacity-75">Equipamentos Ativos</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card bg-danger h-100">
+            <div class="card-body">
+                <i class="bi bi-exclamation-triangle-fill fs-1 opacity-50 mb-3"></i>
+                <h2 class="mb-0">{{ equipamentos_em_manutencao }}</h2>
+                <div class="small opacity-75">Em Manutenção</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card bg-info h-100">
+            <div class="card-body">
+                <i class="bi bi-tools fs-1 opacity-50 mb-3"></i>
+                <h2 class="mb-0">{{ total_manutencoes }}</h2>
+                <div class="small opacity-75">Total de Registros</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela de Status -->
+<div class="row mb-5 animate-fade-in">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="bi bi-list-check"></i> Status dos Equipamentos
-                </h5>
+        <div class="card border-0">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-list-task me-2 text-primary"></i>Status dos Equipamentos</h5>
+                <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="btn btn-sm btn-outline-primary">Ver todos</a>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 {% if equipamentos %}
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
+                        <table class="table table-hover align-middle mb-0" id="table-dashboard">
+                            <thead class="bg-light">
                                 <tr>
-                                    <th>Código</th>
-                                    <th>Nome</th>
+                                    <th class="ps-4">Código</th>
+                                    <th>Equipamento</th>
                                     <th>Setor</th>
-                                    <th>Responsável</th>
                                     <th>Status</th>
-                                    <th>Manutenções</th>
-                                    <th>Ações</th>
+                                    <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for eq in equipamentos %}
+                                {% for eq in equipamentos[:10] %}
                                 <tr class="status-{{ eq.status }}">
-                                    <td><strong>{{ eq.codigo }}</strong></td>
-                                    <td>{{ eq.nome }}</td>
-                                    <td>{{ eq.setor_rel.nome if eq.setor_rel else "N/A" }}</td>
-                                    <td>{{ eq.responsavel_rel.nome if eq.responsavel_rel else "N/A" }}</td>
+                                    <td class="ps-4"><code>{{ eq.codigo }}</code></td>
                                     <td>
-                                        <span class="badge bg-{{ eq.get_status_color() }}">
+                                        <div class="fw-bold">{{ eq.nome }}</div>
+                                        <div class="small text-muted">{{ eq.responsavel_rel.nome if eq.responsavel_rel else "Sem responsável" }}</div>
+                                    </td>
+                                    <td>{{ eq.setor_rel.nome if eq.setor_rel else "N/A" }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ eq.get_status_color() }}-subtle text-{{ eq.get_status_color() }} border border-{{ eq.get_status_color() }}">
                                             {{ eq.get_status_label() }}
                                         </span>
                                     </td>
-                                    <td>
-                                        <span class="badge bg-secondary">
-                                            {{ eq.manutencoes|length }}
-                                        </span>
-                                    </td>
-                                    <td>
+                                    <td class="text-center">
                                         <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=eq.id) }}" 
-                                           class="btn btn-sm btn-info" title="Ver detalhes">
-                                            <i class="bi bi-eye"></i>
+                                           class="btn btn-sm btn-light border" title="Ver detalhes">
+                                            <i class="bi bi-search"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -109,10 +104,11 @@
                         </table>
                     </div>
                 {% else %}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> Nenhum equipamento cadastrado ainda.
+                    <div class="p-5 text-center">
+                        <i class="bi bi-inbox fs-1 text-muted opacity-25"></i>
+                        <p class="mt-3 text-muted">Nenhum equipamento cadastrado ainda.</p>
                         {% if current_user.is_authenticated and current_user.is_admin %}
-                        <a href="{{ url_for('equipamento.novo_equipamento') }}" class="alert-link">Cadastrar primeiro equipamento</a>
+                        <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary btn-sm mt-2">Cadastrar Primeiro</a>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -122,54 +118,45 @@
 </div>
 
 <!-- Ações Rápidas -->
-<div class="row">
+<div class="row g-4 animate-fade-in">
     {% if current_user.is_authenticated and current_user.is_admin %}
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-body text-center">
-                <i class="bi bi-plus-circle display-4 text-primary"></i>
-                <h5 class="card-title mt-3">Novo Equipamento</h5>
-                <p class="card-text">Cadastre um novo equipamento no sistema</p>
-                <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary">
-                    <i class="bi bi-plus"></i> Cadastrar
-                </a>
+    <div class="col-md-6">
+        <div class="card h-100 border-0 bg-primary-subtle border-start border-primary border-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-shrink-0">
+                    <i class="bi bi-plus-circle-fill fs-1 text-primary"></i>
+                </div>
+                <div class="flex-grow-1 ms-4">
+                    <h5 class="card-title mb-1">Novo Equipamento</h5>
+                    <p class="card-text small text-muted mb-3">Adicione novas máquinas ao seu inventário.</p>
+                    <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary btn-sm rounded-pill px-4">Cadastrar</a>
+                </div>
             </div>
         </div>
     </div>
     {% endif %}
-    <div class="col-md-{% if current_user.is_authenticated and current_user.is_admin %}6{% else %}12{% endif %} mb-3">
-        <div class="card">
-            <div class="card-body text-center">
-                <i class="bi bi-file-earmark-plus display-4 text-success"></i>
-                <h5 class="card-title mt-3">Nova Manutenção</h5>
-                <p class="card-text">Registre uma nova manutenção</p>
-                <a href="{{ url_for('manutencao.nova_manutencao') }}" class="btn btn-success">
-                    <i class="bi bi-plus"></i> Registrar
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Legenda de Cores -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="card-title">Legenda de Status:</h6>
-                <div class="d-flex gap-3 flex-wrap">
-                    <div>
-                        <span class="badge bg-success">Verde</span> - Equipamento Ativo/OK
-                    </div>
-                    <div>
-                        <span class="badge bg-danger">Vermelho</span> - Em Manutenção
-                    </div>
-                    <div>
-                        <span class="badge bg-secondary">Cinza</span> - Sucateado
-                    </div>
+    <div class="col-md-{% if current_user.is_authenticated and current_user.is_admin %}6{% else %}12{% endif %}">
+        <div class="card h-100 border-0 bg-success-subtle border-start border-success border-4">
+            <div class="card-body d-flex align-items-center">
+                <div class="flex-shrink-0">
+                    <i class="bi bi-wrench-adjustable fs-1 text-success"></i>
+                </div>
+                <div class="flex-grow-1 ms-4">
+                    <h5 class="card-title mb-1">Registrar Manutenção</h5>
+                    <p class="card-text small text-muted mb-3">Abra um novo chamado de manutenção preventiva ou corretiva.</p>
+                    <a href="{{ url_for('manutencao.nova_manutencao') }}" class="btn btn-success btn-sm rounded-pill px-4">Registrar</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR', { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    });
+</script>
 {% endblock %}

@@ -1,72 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}Equipamentos - Sistema de Manutenção{% endblock %}
+{% block title %}Equipamentos - ManutFlow{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h1 class="display-4">
-            <i class="bi bi-gear"></i> Equipamentos
+<div class="row mb-5 align-items-center animate-fade-in">
+    <div class="col-md-8">
+        <h1 class="display-5 fw-800 text-primary mb-1">
+            <i class="bi bi-pc-display me-2"></i> Equipamentos
         </h1>
-        <p class="lead">Gerenciamento de equipamentos</p>
+        <p class="lead text-muted">Gerencie o inventário e a disponibilidade dos ativos.</p>
     </div>
     {% if current_user.is_authenticated and current_user.is_admin %}
-    <div class="col-auto">
-        <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary btn-lg">
-            <i class="bi bi-plus-circle"></i> Novo Equipamento
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-circle me-2"></i> Novo Equipamento
         </a>
     </div>
     {% endif %}
 </div>
 
-<div class="card">
-    <div class="card-body">
+<div class="card border-0 shadow-sm animate-fade-in">
+    <div class="card-body p-0">
         {% if equipamentos %}
             <div class="table-responsive">
-                <table class="table table-hover" id="tabelaEquipamentos">
-                    <thead class="table-light">
+                <table class="table table-hover align-middle mb-0" id="tabelaEquipamentos">
+                    <thead class="bg-light">
                         <tr>
-                            <th>Código</th>
-                            <th>Nome</th>
+                            <th class="ps-4">Código</th>
+                            <th>Nome do Equipamento</th>
                             <th>Setor</th>
                             <th>Responsável</th>
                             <th>Status</th>
-                            <th>Manutenções</th>
-                            <th>Ações</th>
+                            <th class="text-center">Manutenções</th>
+                            <th class="text-center pe-4">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for eq in equipamentos %}
-                        <tr>
-                            <td><strong>{{ eq.codigo }}</strong></td>
-                            <td>{{ eq.nome }}</td>
+                        <tr class="status-{{ eq.status }}">
+                            <td class="ps-4"><code>{{ eq.codigo }}</code></td>
+                            <td class="fw-bold">{{ eq.nome }}</td>
                             <td>{{ eq.setor_rel.nome if eq.setor_rel else "N/A" }}</td>
                             <td>{{ eq.responsavel_rel.nome if eq.responsavel_rel else "N/A" }}</td>
                             <td>
-                                <span class="badge bg-{{ eq.get_status_color() }}">
+                                <span class="badge bg-{{ eq.get_status_color() }}-subtle text-{{ eq.get_status_color() }} border border-{{ eq.get_status_color() }}">
                                     {{ eq.get_status_label() }}
                                 </span>
                             </td>
-                            <td>
-                                <span class="badge bg-secondary">
+                            <td class="text-center">
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary">
                                     {{ eq.manutencoes|length }}
                                 </span>
                             </td>
-                            <td>
-                                <div class="btn-group" role="group">
+                            <td class="text-center pe-4">
+                                <div class="btn-group shadow-sm" role="group">
                                     <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=eq.id) }}" 
-                                       class="btn btn-sm btn-info" title="Ver detalhes">
-                                        <i class="bi bi-eye"></i>
+                                       class="btn btn-sm btn-light border" title="Ver detalhes">
+                                        <i class="bi bi-eye text-info"></i>
                                     </a>
                                     {% if current_user.is_authenticated and current_user.is_admin %}
                                     <a href="{{ url_for('equipamento.editar_equipamento', equipamento_id=eq.id) }}" 
-                                       class="btn btn-sm btn-warning" title="Editar">
-                                        <i class="bi bi-pencil"></i>
+                                       class="btn btn-sm btn-light border" title="Editar">
+                                        <i class="bi bi-pencil text-warning"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-danger" 
+                                    <button type="button" class="btn btn-sm btn-light border" 
                                             onclick="confirmarDelecao({{ eq.id }}, '{{ eq.codigo }}')" 
                                             title="Deletar">
-                                        <i class="bi bi-trash"></i>
+                                        <i class="bi bi-trash text-danger"></i>
                                     </button>
                                     {% endif %}
                                 </div>
@@ -77,10 +77,11 @@
                 </table>
             </div>
         {% else %}
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> Nenhum equipamento cadastrado ainda.
+            <div class="p-5 text-center">
+                <i class="bi bi-inbox fs-1 text-muted opacity-25"></i>
+                <p class="mt-3 text-muted">Nenhum equipamento cadastrado ainda.</p>
                 {% if current_user.is_authenticated and current_user.is_admin %}
-                <a href="{{ url_for('equipamento.novo_equipamento') }}" class="alert-link">Cadastrar primeiro equipamento</a>
+                <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary btn-sm mt-2">Cadastrar Primeiro</a>
                 {% endif %}
             </div>
         {% endif %}
@@ -89,25 +90,29 @@
 
 <!-- Modal de Confirmação de Deleção -->
 <div class="modal fade" id="modalDelecao" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Confirmar Deleção</h5>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white border-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Deleção</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja deletar o equipamento <strong id="equipamentoCodigo"></strong>?</p>
-                <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> Esta ação não pode ser desfeita e todas as manutenções associadas serão deletadas!</p>
+            <div class="modal-body p-4 text-center">
+                <p class="fs-5">Deseja realmente deletar o equipamento <strong id="equipamentoCodigo" class="text-danger"></strong>?</p>
+                <p class="text-muted small">Esta ação é irreversível e removerá todos os registros de manutenção associados a este ativo.</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <div class="modal-footer border-0 p-4 pt-0 justify-content-center">
+                <button type="button" class="btn btn-light border px-4 rounded-pill" data-bs-dismiss="modal">Cancelar</button>
                 <form id="formDelecao" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Deletar</button>
+                    <button type="submit" class="btn btn-danger px-4 rounded-pill">Confirmar Exclusão</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .fw-800 { font-weight: 800; }
+</style>
 {% endblock %}
 
 {% block extra_js %}

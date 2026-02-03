@@ -1,82 +1,90 @@
 {% extends "base.html" %}
 
-{% block title %}{% if equipamento %}Editar{% else %}Novo{% endif %} Equipamento - Sistema de Manutenção{% endblock %}
+{% block title %}{% if equipamento %}Editar{% else %}Novo{% endif %} Equipamento - ManutFlow{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h1 class="display-4">
-            <i class="bi bi-{% if equipamento %}pencil{% else %}plus-circle{% endif %}"></i> 
+<div class="row mb-5 align-items-center animate-fade-in">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('equipamento.listar_equipamentos') }}" class="text-decoration-none">Equipamentos</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{% if equipamento %}Editar{% else %}Novo{% endif %}</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-800 text-primary mb-1">
+            <i class="bi bi-{% if equipamento %}pencil-square{% else %}plus-circle-fill{% endif %} me-2"></i> 
             {% if equipamento %}Editar{% else %}Novo{% endif %} Equipamento
         </h1>
+        <p class="lead text-muted">{% if equipamento %}Atualize as informações do ativo.{% else %}Registre uma nova máquina no inventário.{% endif %}</p>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="nome" class="form-label">Nome do Equipamento *</label>
-                        <input type="text" class="form-control" id="nome" name="nome" 
-                               value="{% if equipamento %}{{ equipamento.nome }}{% endif %}" 
-                               required placeholder="Ex: Torno Mecânico">
-                    </div>
+<div class="row g-4 animate-fade-in">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label for="nome" class="form-label fw-600 small text-muted text-uppercase">Nome do Equipamento *</label>
+                            <input type="text" class="form-control" id="nome" name="nome" 
+                                   value="{% if equipamento %}{{ equipamento.nome }}{% endif %}" 
+                                   required placeholder="Ex: Torno Mecânico Industrial">
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="codigo" class="form-label">Código *</label>
-                        <input type="text" class="form-control" id="codigo" name="codigo" 
-                               value="{% if equipamento %}{{ equipamento.codigo }}{% endif %}" 
-                               required placeholder="Ex: TM-001">
-                        <div class="form-text">Código único de identificação do equipamento</div>
-                    </div>
+                        <div class="col-md-4">
+                            <label for="codigo" class="form-label fw-600 small text-muted text-uppercase">Código de Identificação *</label>
+                            <input type="text" class="form-control" id="codigo" name="codigo" 
+                                   value="{% if equipamento %}{{ equipamento.codigo }}{% endif %}" 
+                                   required placeholder="Ex: TM-001">
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="setor_id" class="form-label">Setor *</label>
-                        <select class="form-select" id="setor_id" name="setor_id" required>
-                            <option value="" disabled {% if not equipamento %}selected{% endif %}>Selecione um setor...</option>
-                            {% for s in setores %}
-                                <option value="{{ s.id }}" {% if equipamento and equipamento.setor_id == s.id %}selected{% endif %}>
-                                    {{ s.nome }}
+                        <div class="col-md-6">
+                            <label for="setor_id" class="form-label fw-600 small text-muted text-uppercase">Setor Responsável *</label>
+                            <select class="form-select" id="setor_id" name="setor_id" required>
+                                <option value="" disabled {% if not equipamento %}selected{% endif %}>Selecione um setor...</option>
+                                {% for s in setores %}
+                                    <option value="{{ s.id }}" {% if equipamento and equipamento.setor_id == s.id %}selected{% endif %}>
+                                        {{ s.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="responsavel_id" class="form-label fw-600 small text-muted text-uppercase">Técnico Responsável *</label>
+                            <select class="form-select" id="responsavel_id" name="responsavel_id" required>
+                                <option value="" disabled {% if not equipamento %}selected{% endif %}>Selecione um funcionário...</option>
+                                {% for f in funcionarios %}
+                                    <option value="{{ f.id }}" {% if equipamento and equipamento.responsavel_id == f.id %}selected{% endif %}>
+                                        {{ f.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="status" class="form-label fw-600 small text-muted text-uppercase">Status Operacional *</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="ativo" {% if equipamento and equipamento.status == 'ativo' %}selected{% endif %}>
+                                    🟢 Ativo (Operação Normal)
                                 </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="responsavel_id" class="form-label">Responsável *</label>
-                        <select class="form-select" id="responsavel_id" name="responsavel_id" required>
-                            <option value="" disabled {% if not equipamento %}selected{% endif %}>Selecione um responsável...</option>
-                            {% for f in funcionarios %}
-                                <option value="{{ f.id }}" {% if equipamento and equipamento.responsavel_id == f.id %}selected{% endif %}>
-                                    {{ f.nome }}
+                                <option value="em_manutencao" {% if equipamento and equipamento.status == 'em_manutencao' %}selected{% endif %}>
+                                    🟡 Em Manutenção
                                 </option>
-                            {% endfor %}
-                        </select>
+                                <option value="sucateado" {% if equipamento and equipamento.status == 'sucateado' %}selected{% endif %}>
+                                    🔴 Sucateado (Fora de Uso)
+                                </option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Status *</label>
-                        <select class="form-select" id="status" name="status" required>
-                            <option value="ativo" {% if equipamento and equipamento.status == 'ativo' %}selected{% endif %}>
-                                Ativo
-                            </option>
-                            <option value="em_manutencao" {% if equipamento and equipamento.status == 'em_manutencao' %}selected{% endif %}>
-                                Em Manutenção
-                            </option>
-                            <option value="sucateado" {% if equipamento and equipamento.status == 'sucateado' %}selected{% endif %}>
-                                Sucateado
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Cancelar
+                    <div class="d-flex justify-content-end gap-2 mt-5">
+                        <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="btn btn-light border rounded-pill px-4">
+                            Cancelar
                         </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check-circle"></i> {% if equipamento %}Atualizar{% else %}Cadastrar{% endif %}
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">
+                            <i class="bi bi-check-lg me-1"></i> {% if equipamento %}Salvar Alterações{% else %}Cadastrar Ativo{% endif %}
                         </button>
                     </div>
                 </form>
@@ -84,24 +92,39 @@
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card bg-light shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-info-circle"></i> Informações
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm bg-primary bg-opacity-10">
+            <div class="card-body p-4">
+                <h5 class="fw-700 text-primary mb-3">
+                    <i class="bi bi-info-circle-fill me-2"></i>Guia Rápido
                 </h5>
-                <p class="card-text">
-                    Preencha todos os campos obrigatórios (*) para {% if equipamento %}atualizar{% else %}cadastrar{% endif %} o equipamento.
+                <p class="small text-muted mb-4">
+                    Mantenha o inventário atualizado para garantir que as análises de IA e os relatórios de disponibilidade sejam precisos.
                 </p>
-                <hr>
-                <h6>Status:</h6>
-                <ul class="small">
-                    <li><strong>Ativo:</strong> Equipamento em operação normal</li>
-                    <li><strong>Em Manutenção:</strong> Equipamento em processo de manutenção</li>
-                    <li><strong>Sucateado:</strong> Equipamento fora de operação</li>
-                </ul>
+                
+                <div class="d-flex align-items-start mb-3">
+                    <div class="badge bg-primary rounded-circle p-2 me-3"><i class="bi bi-hash"></i></div>
+                    <div>
+                        <h6 class="fw-600 mb-1 small">Código Único</h6>
+                        <p class="small text-muted mb-0">Utilize o padrão da empresa para facilitar a rastreabilidade física.</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start mb-3">
+                    <div class="badge bg-primary rounded-circle p-2 me-3"><i class="bi bi-people"></i></div>
+                    <div>
+                        <h6 class="fw-600 mb-1 small">Responsabilidade</h6>
+                        <p class="small text-muted mb-0">O técnico selecionado será notificado sobre as manutenções deste item.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .fw-600 { font-weight: 600; }
+    .fw-700 { font-weight: 700; }
+    .fw-800 { font-weight: 800; }
+</style>
 {% endblock %}
