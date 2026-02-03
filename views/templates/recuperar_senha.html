@@ -41,7 +41,7 @@
             <form method="POST" action="{{ url_for('auth.recuperar_senha') }}" class="needs-validation" novalidate>
                 <div class="auth-input-group mb-3">
                     <label class="form-label fw-600 small text-muted text-uppercase">E-mail Cadastrado</label>
-                    <div class="position-relative">
+                    <div class="position-relative d-flex align-items-center">
                         <input type="email" name="email" class="auth-input" placeholder="seu-email@empresa.com" required>
                         <i class="bi bi-envelope auth-icon"></i>
                     </div>
@@ -49,7 +49,7 @@
 
                 <div class="auth-input-group mb-3">
                     <label class="form-label fw-600 small text-muted text-uppercase">Nova Senha</label>
-                    <div class="position-relative">
+                    <div class="position-relative d-flex align-items-center">
                         <input type="password" name="nova_senha" id="nova_senha" class="auth-input" placeholder="••••••••" required>
                         <i class="bi bi-eye-slash auth-icon cursor-pointer" onclick="togglePassword('nova_senha', this)"></i>
                     </div>
@@ -57,7 +57,7 @@
 
                 <div class="auth-input-group mb-4">
                     <label class="form-label fw-600 small text-muted text-uppercase">Confirmar Nova Senha</label>
-                    <div class="position-relative">
+                    <div class="position-relative d-flex align-items-center">
                         <input type="password" name="confirmar_senha" id="confirmar_senha" class="auth-input" placeholder="••••••••" required>
                         <i class="bi bi-shield-lock auth-icon"></i>
                     </div>

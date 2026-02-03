@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ManutFlow - Gestão Profissional{% endblock %}</title>
+    <title>{% block title %}ManutEngine - Gestão Profissional{% endblock %}</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,7 +29,7 @@
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard') }}">
                     <img src="{{ url_for('static', filename='img/logo_aguia.png') }}" alt="Logo" width="35" height="35" class="me-2">
-                    <span>ManutFlow</span>
+                    <span>ManutEngine</span>
                 </a>
 
                 <div class="d-flex align-items-center d-lg-none">
@@ -42,31 +42,31 @@
                 </div>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center">
+                    <ul class="navbar-nav ms-auto align-items-center flex-row flex-wrap justify-content-center">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <a class="nav-link px-2" href="{{ url_for('dashboard') }}">
                                 <i class="bi bi-grid-1x2 me-1"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('equipamento.listar_equipamentos') }}">
+                            <a class="nav-link px-2" href="{{ url_for('equipamento.listar_equipamentos') }}">
                                 <i class="bi bi-pc-display me-1"></i> Equipamentos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('manutencao.listar_manutencoes') }}">
+                            <a class="nav-link px-2" href="{{ url_for('manutencao.listar_manutencoes') }}">
                                 <i class="bi bi-tools me-1"></i> Manutenções
                             </a>
                         </li>
                         
                         {% if current_user.is_authenticated and current_user.is_admin %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('ia.dashboard_ia') }}">
+                            <a class="nav-link px-2" href="{{ url_for('ia.dashboard_ia') }}">
                                 <i class="bi bi-cpu me-1"></i> Análise IA
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('setor.lista') }}">
+                            <a class="nav-link px-2" href="{{ url_for('setor.lista') }}">
                                 <i class="bi bi-building me-1"></i> Setores
                             </a>
                         </li>
@@ -87,7 +87,7 @@
                                         <i class="bi bi-person-circle me-1"></i> {{ current_user.nome.split(' ')[0] }}
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2" aria-labelledby="userDropdown">
-                                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.perfil') }}"><i class="bi bi-person me-2"></i> Perfil</a></li>
+                                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.configuracoes') }}"><i class="bi bi-person me-2"></i> Perfil</a></li>
                                         {% if current_user.is_admin %}
                                             <li><a class="dropdown-item py-2" href="{{ url_for('auth.admin_configuracoes') }}"><i class="bi bi-shield-lock me-2"></i> Admin</a></li>
                                         {% endif %}

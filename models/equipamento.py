@@ -18,8 +18,8 @@ class Equipamento(db.Model):
     status = db.Column(db.String(20), nullable=False, default='ativo')
     # Status possíveis: 'ativo', 'em_manutencao', 'sucateado'
     
-    data_cadastro = db.Column(db.DateTime, default=datetime.utcnow)
-    data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    data_cadastro = db.Column(db.DateTime, default=datetime.now)
+    data_atualizacao = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
     # Relacionamento com manutenções
     manutencoes = db.relationship('Manutencao', backref='equipamento', lazy=True, cascade='all, delete-orphan')

@@ -22,7 +22,7 @@ class Manutencao(db.Model):
     # Relacionamento para acessar o nome do autor
     autor_rel = db.relationship('Funcionario', backref='manutencoes_registradas', lazy=True)
     
-    data_registro = db.Column(db.DateTime, default=datetime.utcnow)
+    data_registro = db.Column(db.DateTime, default=datetime.now)
     
     def __repr__(self):
         return f'<Manutencao {self.id} - {self.tipo} - Equipamento {self.equipamento_id}>'
