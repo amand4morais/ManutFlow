@@ -21,17 +21,51 @@
     <link rel="icon" href="{{ url_for('static', filename='img/logo_aguia.png') }}" type="image/x-icon">
     
     {% block extra_css %}{% endblock %}
+    
+    <style>
+        /* Estilos para compactar a navbar em telas grandes e evitar quebra/corte */
+        @media (min-width: 992px) {
+            .navbar-compact .nav-link {
+                font-size: 0.85rem; /* Fonte ligeiramente menor */
+                padding-left: 0.5rem !important; /* Menos espaçamento lateral */
+                padding-right: 0.5rem !important;
+                white-space: nowrap;
+            }
+            .navbar-compact .navbar-brand {
+                font-size: 1.15rem;
+                margin-right: 0.5rem;
+            }
+            /* Ajuste para o botão de perfil não ocupar muito espaço */
+            .user-btn-compact {
+                font-size: 0.85rem;
+                padding: 0.25rem 0.75rem;
+            }
+        }
+        
+        /* Ajuste fino para telas intermediárias (Laptops menores) */
+        @media (min-width: 992px) and (max-width: 1200px) {
+            .navbar-compact .nav-link {
+                font-size: 0.8rem;
+                padding-left: 0.3rem !important;
+                padding-right: 0.3rem !important;
+            }
+            .nav-text-label {
+                display: none; /* Em telas muito apertadas, esconde ícones ou ajusta se necessário */
+            }
+        }
+    </style>
 </head>
 <body class="{% block body_class %}{% endblock %}">
     {% block layout %}
-        <!-- Navbar Profissional -->
-        <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-            <div class="container">
+        <!-- Navbar Compacta e Fluida -->
+        <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-3 navbar-compact">
+            <div class="container-fluid px-3">
                 <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard') }}">
-                    <img src="{{ url_for('static', filename='img/logo_aguia.png') }}" alt="Logo" width="35" height="35" class="me-2">
-                    <span>ManutEngine</span>
+                    <img src="{{ url_for('static', filename='img/logo_aguia.png') }}" alt="Logo" width="32" height="32" class="me-2">
+                    <span class="fw-bold">ManutEngine</span>
                 </a>
 
+                <!-- Botões Mobile -->
                 <div class="d-flex align-items-center d-lg-none">
                     <button class="theme-toggle me-2" id="theme-toggle-mobile">
                         <i class="bi bi-sun-fill" id="theme-icon-mobile"></i>
@@ -42,47 +76,51 @@
                 </div>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center flex-row flex-wrap justify-content-center">
+                    <!-- flex-lg-nowrap força linha única. ms-auto empurra para direita. -->
+                    <ul class="navbar-nav ms-auto align-items-center flex-lg-nowrap">
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="{{ url_for('dashboard') }}">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">
                                 <i class="bi bi-grid-1x2 me-1"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="{{ url_for('equipamento.listar_equipamentos') }}">
+                            <a class="nav-link" href="{{ url_for('equipamento.listar_equipamentos') }}">
                                 <i class="bi bi-pc-display me-1"></i> Equipamentos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="{{ url_for('manutencao.listar_manutencoes') }}">
+                            <a class="nav-link" href="{{ url_for('manutencao.listar_manutencoes') }}">
                                 <i class="bi bi-tools me-1"></i> Manutenções
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="{{ url_for('notificacao.listar_agendamentos') }}">
+                            <a class="nav-link" href="{{ url_for('notificacao.listar_agendamentos') }}">
                                 <i class="bi bi-calendar-check me-1"></i> Agendamentos
                             </a>
                         </li>
                         
                         {% if current_user.is_authenticated and current_user.is_admin %}
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="{{ url_for('ia.dashboard_ia') }}">
-                                <i class="bi bi-cpu me-1"></i> Análise IA
+                            <a class="nav-link" href="{{ url_for('ia.dashboard_ia') }}">
+                                <i class="bi bi-cpu me-1"></i> IA
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="{{ url_for('setor.lista') }}">
+                            <a class="nav-link" href="{{ url_for('setor.lista') }}">
                                 <i class="bi bi-building me-1"></i> Setores
                             </a>
                         </li>
                         {% endif %}
                         
+                        <!-- Separador vertical discreto -->
+                        <li class="nav-item d-none d-lg-block mx-1 border-end border-white border-opacity-25" style="height: 18px;"></li>
+                        
                         <!-- Notificações -->
                         {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link px-2 position-relative" href="{{ url_for('notificacao.listar') }}">
-                                <i class="bi bi-bell fs-5"></i>
-                                <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.6rem;">
+                            <a class="nav-link position-relative px-2" href="{{ url_for('notificacao.listar') }}" title="Notificações">
+                                <i class="bi bi-bell fs-6"></i>
+                                <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.5rem;">
                                     0
                                 </span>
                             </a>
@@ -90,31 +128,36 @@
                         {% endif %}
 
                         <!-- Theme Toggle Desktop -->
-                        <li class="nav-item d-none d-lg-block">
-                            <button class="theme-toggle" id="theme-toggle">
-                                <i class="bi bi-sun-fill" id="theme-icon"></i>
+                        <li class="nav-item d-none d-lg-block mx-1">
+                            <button class="theme-toggle p-1" id="theme-toggle">
+                                <i class="bi bi-sun-fill fs-6" id="theme-icon"></i>
                             </button>
                         </li>
 
                         <!-- User Profile Dropdown -->
-                        <li class="nav-item ms-lg-3">
+                        <!-- flex-shrink-0 impede que o container do botão seja esmagado -->
+                        <li class="nav-item ms-lg-2 flex-shrink-0">
                             {% if current_user.is_authenticated %}
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-light dropdown-toggle rounded-pill px-3" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-person-circle me-1"></i> {{ current_user.nome.split(' ')[0] }}
+                                    <button class="btn btn-outline-light dropdown-toggle rounded-pill user-btn-compact d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-circle fs-6 me-2"></i> 
+                                        <!-- text-truncate com max-width garante que se o nome for longo, vira "Nome..." e não quebra o layout -->
+                                        <span class="d-inline-block text-truncate fw-500" style="max-width: 100px;">
+                                            {{ current_user.nome }}
+                                        </span>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2" aria-labelledby="userDropdown">
-                                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.perfil') }}"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
-                                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.configuracoes') }}"><i class="bi bi-gear me-2"></i> Configurações</a></li>
+                                        <li><a class="dropdown-item py-2 small" href="{{ url_for('auth.perfil') }}"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
+                                        <li><a class="dropdown-item py-2 small" href="{{ url_for('auth.configuracoes') }}"><i class="bi bi-gear me-2"></i> Configurações</a></li>
                                         {% if current_user.is_admin %}
-                                            <li><a class="dropdown-item py-2" href="{{ url_for('auth.admin_configuracoes') }}"><i class="bi bi-shield-lock me-2"></i> Admin</a></li>
+                                            <li><a class="dropdown-item py-2 small" href="{{ url_for('auth.admin_configuracoes') }}"><i class="bi bi-shield-lock me-2"></i> Admin</a></li>
                                         {% endif %}
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item py-2 text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
+                                        <li><a class="dropdown-item py-2 text-danger small" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
                                     </ul>
                                 </div>
                             {% else %}
-                                <a class="btn btn-light text-primary fw-bold rounded-pill px-4" href="{{ url_for('auth.login') }}">
+                                <a class="btn btn-light text-primary fw-bold rounded-pill px-3 btn-sm" href="{{ url_for('auth.login') }}">
                                     Login
                                 </a>
                             {% endif %}
@@ -152,7 +195,7 @@
                 <div class="mb-3">
                     <img src="{{ url_for('static', filename='img/logo_aguia.png') }}" alt="Logo" width="30" height="30" class="opacity-50">
                 </div>
-                <p class="mb-1 fw-bold">ManutFlow &copy; 2026</p>
+                <p class="mb-1 fw-bold">ManutEngine &copy; 2026</p>
                 <p class="small opacity-75">Sistema Inteligente de Gestão de Manutenção</p>
             </div>
         </footer>

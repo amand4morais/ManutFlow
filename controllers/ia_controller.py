@@ -119,6 +119,17 @@ def gerar_analise_ia(dados):
     """
     Usa a IA do Groq para gerar análise e sugestões baseadas nos dados
     """
+    # 1. VALIDAÇÃO DE DADOS VAZIOS (CORREÇÃO SOLICITADA)
+    # Se não houver manutenções no período filtrado, não chamamos a IA.
+    # Isso evita "alucinações" ou dicas genéricas quando o período está vazio.
+    if dados['estatisticas_gerais']['total_manutencoes'] == 0:
+        return {
+            'resumo_saude': None, # Retorna None para indicar que não houve análise
+            'equipamentos_criticos': [],
+            'analise_setores': [],
+            'recomendacoes': []
+        }
+
     groq_client = get_groq_client()
     
     if not groq_client:
