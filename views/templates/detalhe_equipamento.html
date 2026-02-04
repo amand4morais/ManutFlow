@@ -46,9 +46,18 @@
                     </div>
                     <div class="col-sm-6">
                         <label class="small text-muted text-uppercase fw-600 d-block">Status Atual</label>
-                        <span class="badge bg-{{ equipamento.get_status_color() }}-subtle text-{{ equipamento.get_status_color() }} border border-{{ equipamento.get_status_color() }} fs-6">
-                            {{ equipamento.get_status_label() }}
-                        </span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-{{ equipamento.get_status_color() }}-subtle text-{{ equipamento.get_status_color() }} border border-{{ equipamento.get_status_color() }} fs-6">
+                                {{ equipamento.get_status_label() }}
+                            </span>
+                            {% if equipamento.status == 'em_manutencao' and (current_user.id == equipamento.responsavel_id or current_user.is_admin) %}
+                            <form action="{{ url_for('equipamento.concluir_manutencao', equipamento_id=equipamento.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-2 py-0" style="font-size: 0.7rem;" title="Marcar como Consertado">
+                                    <i class="bi bi-check-lg"></i> Concluir
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="col-sm-6">
                         <label class="small text-muted text-uppercase fw-600 d-block">Setor Responsável</label>

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Agendar Preventiva - ManutFlow{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white p-4 rounded-top-4">
+                    <h4 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Agendar Manutenção Preventiva</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="equipamento_id" class="form-label fw-bold">Equipamento</label>
+                            <select class="form-select rounded-3" id="equipamento_id" name="equipamento_id" required>
+                                <option value="" selected disabled>Selecione o equipamento...</option>
+                                {% for eq in equipamentos %}
+                                <option value="{{ eq.id }}">{{ eq.codigo }} - {{ eq.nome }} (Resp: {{ eq.responsavel_rel.nome }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="data_prevista" class="form-label fw-bold">Data Prevista</label>
+                            <input type="date" class="form-control rounded-3" id="data_prevista" name="data_prevista" required min="{{ today }}">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="descricao" class="form-label fw-bold">Descrição da Preventiva</label>
+                            <textarea class="form-control rounded-3" id="descricao" name="descricao" rows="3" placeholder="Ex: Troca de óleo, limpeza de filtros..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('notificacao.listar_agendamentos') }}" class="btn btn-light rounded-pill px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">Agendar Manutenção</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -9,12 +9,15 @@ from models.equipamento import Equipamento
 from models.manutencao import Manutencao
 from models.setor import Setor
 from models.funcionario import Funcionario
+from models.notificacao import Notificacao
+from models.agendamento import Agendamento
 
 from controllers.equipamento_controller import equipamento_bp
 from controllers.manutencao_controller import manutencao_bp
 from controllers.ia_controller import ia_bp
 from controllers.setor_controller import setor_bp
 from controllers.auth_controller import auth_bp
+from controllers.notificacao_controller import notificacao_bp
 
 import config
 from dotenv import load_dotenv
@@ -53,6 +56,7 @@ app.register_blueprint(manutencao_bp)
 app.register_blueprint(ia_bp)
 app.register_blueprint(setor_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(notificacao_bp)
 
 @app.route('/')
 def index():

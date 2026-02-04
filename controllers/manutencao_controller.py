@@ -98,6 +98,20 @@ def nova_manutencao():
             
             manutencao.save()
             
+            # Notificar Admins sobre nova manutenção (Requisito)
+            from models.notificacao import Notificacao
+            from models.funcionario import Funcionario
+            admins = Funcionario.query.filter_by(is_admin=True).all()
+            for admin in admins:
+                if admin.id != current_user.id: # Não notifica a si mesmo
+                    Notificacao.criar(
+                        usuario_id=admin.id,
+                        titulo="Nova Manutenção Registrada",
+                        mensagem=f"{current_user.nome} registrou uma manutenção {tipo} para o equipamento {equipamento.nome}.",
+                        tipo="success",
+                        link=url_for('manutencao.detalhe_manutencao', manutencao_id=manutencao.id)
+                    )
+
             # Se o tipo for corretiva, atualiza status do equipamento para "em_manutencao"
             if tipo == 'corretiva' and equipamento.status == 'ativo':
                 equipamento.status = 'em_manutencao'

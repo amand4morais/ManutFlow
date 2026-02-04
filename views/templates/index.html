@@ -17,6 +17,9 @@
     </div>
 </div>
 
+<!-- Alertas de Manutenção Preventiva -->
+<div id="preventiva-alerts"></div>
+
 <!-- Cards de Estatísticas Modernos -->
 <div class="row mb-5 g-4 animate-fade-in">
     <div class="col-md-3">
@@ -158,5 +161,38 @@
     document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR', { 
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
     });
+
+    // Carregar alertas de preventivas via API
+    function loadPreventivaAlerts() {
+        fetch('{{ url_for("notificacao.listar") }}')
+            .then(response => response.text())
+            .then(html => {
+                // Filtra apenas as notificações de aviso (warning) que são sobre preventivas
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const alerts = Array.from(doc.querySelectorAll('.list-group-item-action.border-warning'));
+                
+                if (alerts.length > 0) {
+                    let alertsHtml = '<div class="row mb-4 animate-fade-in"><div class="col-12">';
+                    alerts.slice(0, 3).forEach(alert => {
+                        const titulo = alert.querySelector('h6').innerText;
+                        const msg = alert.querySelector('p').innerText;
+                        alertsHtml += `
+                            <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                                <div class="flex-grow-1">
+                                    <strong>${titulo}</strong><br>
+                                    <span class="small">${msg}</span>
+                                </div>
+                                <a href="${alert.href}" class="btn btn-sm btn-warning rounded-pill px-3 ms-3">Ver</a>
+                            </div>
+                        `;
+                    });
+                    alertsHtml += '</div></div>';
+                    document.getElementById('preventiva-alerts').innerHTML = alertsHtml;
+                }
+            });
+    }
+    loadPreventivaAlerts();
 </script>
 {% endblock %}

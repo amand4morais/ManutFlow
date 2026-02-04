@@ -121,3 +121,25 @@ def deletar_equipamento(equipamento_id):
         flash(f'Equipamento {codigo} deletado!', 'success')
     
     return redirect(url_for('equipamento.listar_equipamentos'))
+
+@equipamento_bp.route('/equipamentos/<int:equipamento_id>/concluir', methods=['POST'])
+@login_required
+def concluir_manutencao(equipamento_id):
+    """Altera o status do equipamento para 'ativo' - Responsável ou Admin"""
+    equipamento = Equipamento.get_by_id(equipamento_id)
+    if not equipamento:
+        flash('Equipamento não encontrado!', 'danger')
+        return redirect(url_for('equipamento.listar_equipamentos'))
+    
+    # Verifica se o usuário é o responsável ou admin
+    if current_user.id == equipamento.responsavel_id or current_user.is_admin:
+        equipamento.status = 'ativo'
+        try:
+            equipamento.save()
+            flash(f'Manutenção concluída! O equipamento {equipamento.codigo} agora está ATIVO.', 'success')
+        except Exception as e:
+            flash(f'Erro ao atualizar status: {str(e)}', 'danger')
+    else:
+        flash('Acesso negado! Apenas o responsável ou um administrador podem concluir a manutenção.', 'danger')
+        
+    return redirect(url_for('equipamento.detalhe_equipamento', equipamento_id=equipamento_id))

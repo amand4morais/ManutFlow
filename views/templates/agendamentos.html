@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Agendamentos - ManutFlow{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Manutenções Preventivas</h2>
+        {% if current_user.is_admin %}
+        <a href="{{ url_for('notificacao.novo_agendamento') }}" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-plus-lg me-1"></i> Novo Agendamento
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Equipamento</th>
+                        <th>Data Prevista</th>
+                        <th>Descrição</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ag in agendamentos %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-bold">{{ ag.equipamento.nome }}</div>
+                            <div class="small text-muted">{{ ag.equipamento.codigo }}</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-calendar3 me-1"></i> {{ ag.data_prevista.strftime('%d/%m/%Y') }}
+                            </span>
+                        </td>
+                        <td><span class="text-truncate d-inline-block" style="max-width: 200px;">{{ ag.descricao or 'Sem descrição' }}</span></td>
+                        <td>
+                            {% if ag.status == 'pendente' %}
+                                <span class="badge bg-warning text-dark rounded-pill">Pendente</span>
+                            {% elif ag.status == 'concluido' %}
+                                <span class="badge bg-success rounded-pill">Concluído</span>
+                            {% else %}
+                                <span class="badge bg-secondary rounded-pill">{{ ag.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{{ url_for('equipamento.detalhe_equipamento', equipamento_id=ag.equipamento_id) }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            Nenhum agendamento encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

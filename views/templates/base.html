@@ -58,6 +58,11 @@
                                 <i class="bi bi-tools me-1"></i> Manutenções
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-2" href="{{ url_for('notificacao.listar_agendamentos') }}">
+                                <i class="bi bi-calendar-check me-1"></i> Agendamentos
+                            </a>
+                        </li>
                         
                         {% if current_user.is_authenticated and current_user.is_admin %}
                         <li class="nav-item">
@@ -72,6 +77,18 @@
                         </li>
                         {% endif %}
                         
+                        <!-- Notificações -->
+                        {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link px-2 position-relative" href="{{ url_for('notificacao.listar') }}">
+                                <i class="bi bi-bell fs-5"></i>
+                                <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.6rem;">
+                                    0
+                                </span>
+                            </a>
+                        </li>
+                        {% endif %}
+
                         <!-- Theme Toggle Desktop -->
                         <li class="nav-item d-none d-lg-block">
                             <button class="theme-toggle" id="theme-toggle">
@@ -87,7 +104,8 @@
                                         <i class="bi bi-person-circle me-1"></i> {{ current_user.nome.split(' ')[0] }}
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2" aria-labelledby="userDropdown">
-                                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.configuracoes') }}"><i class="bi bi-person me-2"></i> Perfil</a></li>
+                                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.perfil') }}"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
+                                        <li><a class="dropdown-item py-2" href="{{ url_for('auth.configuracoes') }}"><i class="bi bi-gear me-2"></i> Configurações</a></li>
                                         {% if current_user.is_admin %}
                                             <li><a class="dropdown-item py-2" href="{{ url_for('auth.admin_configuracoes') }}"><i class="bi bi-shield-lock me-2"></i> Admin</a></li>
                                         {% endif %}
@@ -172,6 +190,28 @@
         }
     </script>
 
+    <script>
+        // Atualizar badge de notificações
+        function updateNotifBadge() {
+            fetch('/api/notificacoes/count')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notif-badge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.innerText = data.count;
+                            badge.classList.remove('d-none');
+                        } else {
+                            badge.classList.add('d-none');
+                        }
+                    }
+                });
+        }
+        if ({{ 'true' if current_user.is_authenticated else 'false' }}) {
+            updateNotifBadge();
+            setInterval(updateNotifBadge, 30000); // Atualiza a cada 30 segundos
+        }
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

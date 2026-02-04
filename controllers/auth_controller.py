@@ -20,6 +20,14 @@ def login():
         # Nota: Em um ambiente de produção real, deve-se usar hash de senha
         if user and user.senha == senha:
             login_user(user)
+            
+            # Verificar prazos de preventivas ao logar
+            try:
+                from controllers.notificacao_controller import verificar_prazos_preventivas
+                verificar_prazos_preventivas()
+            except:
+                pass
+            
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('dashboard'))
         else:
