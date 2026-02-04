@@ -1,5 +1,6 @@
 from models.database import db
 from datetime import datetime
+from sqlalchemy import event
 
 class Equipamento(db.Model):
     """
@@ -106,3 +107,71 @@ class Equipamento(db.Model):
         """
         db.session.delete(self)
         db.session.commit()
+
+# Gatilhos Automáticos para Histórico
+@event.listens_for(Equipamento, 'after_insert')
+def registrar_aquisicao(mapper, connection, target):
+    from models.historico_equipamento import HistoricoEquipamento
+    # Usamos o objeto da sessão atual para adicionar o histórico
+    novo_h = HistoricoEquipamento(
+        equipamento_id=target.id,
+        evento='AQUISIÇÃO',
+        descricao=f"Equipamento cadastrado no sistema com status inicial: {target.get_status_label()}."
+    )
+    db.session.add(novo_h)
+
+@event.listens_for(Equipamento, 'before_update')
+def registrar_mudancas(mapper, connection, target):
+    from models.historico_equipamento import HistoricoEquipamento
+    from models.setor import Setor
+    from models.funcionario import Funcionario
+    
+    # Obtém o estado anterior do objeto
+    state = db.inspect(target)
+    
+    # Verifica mudança de Setor
+    attr_setor = state.attrs.get('setor_id')
+    if attr_setor.history.has_changes():
+        old_id = attr_setor.history.deleted[0] if attr_setor.history.deleted else None
+        new_id = target.setor_id
+        if old_id and old_id != new_id:
+            old_setor = Setor.query.get(old_id)
+            new_setor = Setor.query.get(new_id)
+            novo_h = HistoricoEquipamento(
+                equipamento_id=target.id,
+                evento='TROCA DE SETOR',
+                valor_anterior=old_setor.nome if old_setor else "N/A",
+                valor_novo=new_setor.nome if new_setor else "N/A",
+                descricao=f"Equipamento transferido do setor {old_setor.nome if old_setor else 'N/A'} para {new_setor.nome if new_setor else 'N/A'}."
+            )
+            db.session.add(novo_h)
+
+    # Verifica mudança de Responsável
+    attr_resp = state.attrs.get('responsavel_id')
+    if attr_resp.history.has_changes():
+        old_id = attr_resp.history.deleted[0] if attr_resp.history.deleted else None
+        new_id = target.responsavel_id
+        if old_id and old_id != new_id:
+            old_resp = Funcionario.query.get(old_id)
+            new_resp = Funcionario.query.get(new_id)
+            novo_h = HistoricoEquipamento(
+                equipamento_id=target.id,
+                evento='TROCA DE RESPONSÁVEL',
+                valor_anterior=old_resp.nome if old_resp else "N/A",
+                valor_novo=new_resp.nome if new_resp else "N/A",
+                descricao=f"Responsabilidade técnica transferida de {old_resp.nome if old_resp else 'N/A'} para {new_resp.nome if new_resp else 'N/A'}."
+            )
+            db.session.add(novo_h)
+
+    # Verifica mudança de Status (Conserto concluído)
+    attr_status = state.attrs.get('status')
+    if attr_status.history.has_changes():
+        old_status = attr_status.history.deleted[0] if attr_status.history.deleted else None
+        new_status = target.status
+        if old_status == 'em_manutencao' and new_status == 'ativo':
+            novo_h = HistoricoEquipamento(
+                equipamento_id=target.id,
+                evento='MANUTENÇÃO CONCLUÍDA',
+                descricao="O equipamento foi consertado e retornou ao status ATIVO."
+            )
+            db.session.add(novo_h)

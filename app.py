@@ -11,6 +11,7 @@ from models.setor import Setor
 from models.funcionario import Funcionario
 from models.notificacao import Notificacao
 from models.agendamento import Agendamento
+from models.historico_equipamento import HistoricoEquipamento
 
 from controllers.equipamento_controller import equipamento_bp
 from controllers.manutencao_controller import manutencao_bp

@@ -2,6 +2,69 @@
 
 {% block title %}{{ equipamento.nome }} - ManutFlow{% endblock %}
 
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding: 10px 0;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+        left: 20px;
+        margin: 0;
+    }
+    .timeline-item {
+        position: relative;
+        margin-bottom: 25px;
+        padding-left: 50px;
+    }
+    .timeline-icon {
+        position: absolute;
+        left: 5px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 30px;
+        background: #fff;
+        border: 2px solid #0d6efd;
+        color: #0d6efd;
+        z-index: 1;
+        font-size: 0.8rem;
+    }
+    .timeline-date {
+        font-size: 0.7rem;
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 3px;
+        display: block;
+    }
+    .timeline-content {
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+    .timeline-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 3px;
+        color: #212529;
+    }
+    .timeline-text {
+        font-size: 0.8rem;
+        color: #495057;
+        margin-bottom: 0;
+    }
+    .x-small { font-size: 0.7rem; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row mb-5 align-items-center animate-fade-in">
     <div class="col-md-8">
@@ -110,14 +173,55 @@
     </div>
 </div>
 
-<!-- Histórico de Manutenções -->
-<div class="row animate-fade-in">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
+<!-- Linha do Tempo e Histórico -->
+<div class="row g-4 animate-fade-in">
+    <!-- Timeline Automática -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-700 mb-0"><i class="bi bi-journal-text me-2 text-primary"></i>Linha do Tempo</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="timeline">
+                    {% for item in equipamento.historico|sort(attribute='data_evento', reverse=True) %}
+                    <div class="timeline-item">
+                        <div class="timeline-icon">
+                            {% if item.evento == 'AQUISIÇÃO' %}<i class="bi bi-stars"></i>
+                            {% elif 'MANUTENÇÃO' in item.evento %}<i class="bi bi-wrench"></i>
+                            {% elif 'SETOR' in item.evento %}<i class="bi bi-building"></i>
+                            {% else %}<i class="bi bi-person-badge"></i>{% endif %}
+                        </div>
+                        <span class="timeline-date">{{ item.data_evento.strftime('%d/%m/%Y %H:%M') }}</span>
+                        <div class="timeline-content shadow-sm">
+                            <div class="timeline-title">{{ item.evento }}</div>
+                            <p class="timeline-text small">{{ item.descricao }}</p>
+                            {% if item.valor_anterior and item.valor_novo %}
+                            <div class="mt-2 x-small text-muted">
+                                <span class="text-danger text-decoration-line-through">{{ item.valor_anterior }}</span>
+                                <i class="bi bi-arrow-right mx-1"></i>
+                                <span class="text-success fw-bold">{{ item.valor_novo }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 opacity-50">
+                        <i class="bi bi-clock-history fs-2 d-block mb-2"></i>
+                        <small>Nenhum evento registrado.</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Manutenções -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-4 px-4">
                 <h5 class="fw-700 mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Histórico de Manutenções</h5>
                 <a href="{{ url_for('manutencao.nova_manutencao', equipamento_id=equipamento.id) }}" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm">
-                    <i class="bi bi-plus-circle me-1"></i> Nova Manutenção
+                    <i class="bi bi-plus-circle me-1"></i> Nova
                 </a>
             </div>
             <div class="card-body p-0 mt-3">
@@ -128,9 +232,8 @@
                                 <tr>
                                     <th class="ps-4">Data</th>
                                     <th>Tipo</th>
-                                    <th>Descrição do Serviço</th>
+                                    <th>Descrição</th>
                                     {% if current_user.is_admin %}<th>Custo</th>{% endif %}
-                                    <th>Autor</th>
                                     <th class="text-center pe-4">Ações</th>
                                 </tr>
                             </thead>
@@ -138,20 +241,19 @@
                                 {% for m in manutencoes %}
                                 <tr>
                                     <td class="ps-4">
-                                        <div class="fw-bold">{{ m.data_manutencao.strftime('%d/%m/%Y') }}</div>
+                                        <div class="fw-bold small">{{ m.data_manutencao.strftime('%d/%m/%Y') }}</div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-{{ m.get_tipo_color() }}-subtle text-{{ m.get_tipo_color() }} border border-{{ m.get_tipo_color() }}">
+                                        <span class="badge bg-{{ m.get_tipo_color() }}-subtle text-{{ m.get_tipo_color() }} border border-{{ m.get_tipo_color() }}" style="font-size: 0.7rem;">
                                             {{ m.get_tipo_label() }}
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="text-truncate" style="max-width: 300px;" title="{{ m.descricao }}">
+                                        <div class="text-truncate small" style="max-width: 200px;" title="{{ m.descricao }}">
                                             {{ m.descricao }}
                                         </div>
                                     </td>
-                                    {% if current_user.is_admin %}<td class="fw-bold text-primary">R$ {{ "%.2f"|format(m.custo) }}</td>{% endif %}
-                                    <td>{{ m.autor_rel.nome if m.autor_rel else "N/A" }}</td>
+                                    {% if current_user.is_admin %}<td class="fw-bold text-primary small">R$ {{ "%.2f"|format(m.custo) }}</td>{% endif %}
                                     <td class="text-center pe-4">
                                         <a href="{{ url_for('manutencao.detalhe_manutencao', manutencao_id=m.id) }}" 
                                            class="btn btn-sm btn-light border" title="Ver detalhes">
@@ -166,7 +268,7 @@
                 {% else %}
                     <div class="p-5 text-center">
                         <i class="bi bi-info-circle fs-1 text-muted opacity-25"></i>
-                        <p class="mt-3 text-muted">Nenhuma manutenção registrada para este equipamento.</p>
+                        <p class="mt-3 text-muted">Nenhuma manutenção registrada.</p>
                     </div>
                 {% endif %}
             </div>

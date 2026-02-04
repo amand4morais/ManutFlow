@@ -1,5 +1,6 @@
 from models.database import db
 from datetime import datetime
+from sqlalchemy import event
 
 class Manutencao(db.Model):
     """
@@ -137,3 +138,14 @@ class Manutencao(db.Model):
         """
         db.session.delete(self)
         db.session.commit()
+
+# Gatilho Automático para Histórico de Manutenção
+@event.listens_for(Manutencao, 'after_insert')
+def registrar_historico_manutencao(mapper, connection, target):
+    from models.historico_equipamento import HistoricoEquipamento
+    novo_h = HistoricoEquipamento(
+        equipamento_id=target.equipamento_id,
+        evento='MANUTENÇÃO INICIADA',
+        descricao=f"Manutenção {target.get_tipo_label()} registrada. Descrição: {target.descricao[:100]}..."
+    )
+    db.session.add(novo_h)

@@ -19,6 +19,11 @@ def login():
 
         # Nota: Em um ambiente de produção real, deve-se usar hash de senha
         if user and user.senha == senha:
+            # Limpa mensagens flash pendentes antes de logar o novo usuário
+            # Isso evita que erros de tentativas falhas anteriores apareçam para o novo usuário
+            from flask import get_flashed_messages
+            get_flashed_messages()
+            
             login_user(user)
             
             # Verificar prazos de preventivas ao logar
@@ -31,7 +36,9 @@ def login():
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('dashboard'))
         else:
-            flash('Email ou senha incorretos.', 'danger')
+            flash('Email ou senha incorretos. Verifique seus dados e tente novamente.', 'danger')
+            # Redireciona para a própria página de login para garantir que o flash apareça nela
+            return redirect(url_for('auth.login'))
 
     return render_template('login.html')
 
