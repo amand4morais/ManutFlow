@@ -38,6 +38,22 @@
     color: var(--text-main) !important;
 }
 
+[data-theme="dark"] .text-primary {
+    color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .text-danger {
+    color: var(--danger-color) !important;
+}
+
+[data-theme="dark"] .text-success {
+    color: var(--success-color) !important;
+}
+
 [data-theme="dark"] .bg-light {
     background-color: var(--bg-body) !important;
 }
@@ -55,6 +71,196 @@
 [data-theme="dark"] .modal-content {
     background-color: var(--bg-card);
     color: var(--text-main);
+}
+
+/* Correções para Modo Escuro - Legendas e Tabelas */
+[data-theme="dark"] .bg-light, 
+[data-theme="dark"] .card-header.bg-light,
+[data-theme="dark"] .table thead.bg-light {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .table thead th {
+    color: var(--text-main) !important;
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .card-header.bg-white {
+    background-color: var(--bg-card) !important;
+}
+
+[data-theme="dark"] .list-group-item {
+    background-color: transparent;
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .timeline-content {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .timeline-title {
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .timeline-text {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .timeline-icon {
+    background-color: var(--bg-card) !important;
+}
+
+[data-theme="dark"] .timeline::before {
+    background-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .custom-pills .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] code {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f87171;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .bg-primary-subtle {
+    background-color: rgba(36, 36, 128, 0.2) !important;
+}
+
+[data-theme="dark"] .bg-success-subtle {
+    background-color: rgba(40, 167, 69, 0.2) !important;
+}
+
+[data-theme="dark"] .card-footer.bg-light {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+/* Correções Globais de Legendas e Cores Fixas */
+[data-theme="dark"] .text-dark,
+[data-theme="dark"] .text-dark-50,
+[data-theme="dark"] .text-black-50 {
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .bg-light,
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-white-50 {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .input-group-text.bg-light,
+[data-theme="dark"] .input-group-text.bg-white {
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .form-control.bg-light,
+[data-theme="dark"] .form-control.bg-white,
+[data-theme="dark"] .form-select.bg-light {
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .list-group-item.bg-light {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .badge.bg-light.text-dark {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .badge.text-dark {
+    color: #1e293b !important; /* Mantém legibilidade em badges amarelos/claros se necessário, ou força branco */
+}
+
+[data-theme="dark"] .badge.bg-warning.text-dark,
+[data-theme="dark"] .badge.bg-info.text-dark {
+    color: #1e293b !important; /* Mantém contraste em fundos amarelos/azuis claros */
+}
+
+[data-theme="dark"] .text-primary {
+    color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .border {
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .btn-light {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-light:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-main);
+}
+
+/* Forçar textos brancos no modo escuro */
+[data-theme="dark"] .text-main,
+[data-theme="dark"] .text-dark,
+[data-theme="dark"] .fw-bold,
+[data-theme="dark"] .fw-600,
+[data-theme="dark"] .fw-700,
+[data-theme="dark"] .fw-800,
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, 
+[data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6,
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .table,
+[data-theme="dark"] label,
+[data-theme="dark"] .form-label {
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .small,
+[data-theme="dark"] small,
+[data-theme="dark"] .text-uppercase {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .text-primary {
+    color: #60a5fa !important;
+}
+
+/* Corrigir placeholders no modo escuro */
+[data-theme="dark"] ::placeholder,
+[data-theme="dark"] .form-control::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 0.7;
+}
+
+/* Forçar cabeçalhos de tabela escuros no modo escuro */
+[data-theme="dark"] .table-light,
+[data-theme="dark"] .table thead.table-light,
+[data-theme="dark"] .table thead.bg-light {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-bottom: 2px solid #334155 !important;
 }
 
 body {

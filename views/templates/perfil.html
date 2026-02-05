@@ -17,13 +17,13 @@
         <!-- Card de Informações do Perfil -->
         <div class="card border-0 shadow-sm mb-4 overflow-hidden">
             <div class="bg-primary py-4"></div>
-            <div class="card-body text-center pt-0" style="margin-top: -40px;">
+            <div class="card-body text-center pt-3">
                 <div class="mb-3">
-                    <div class="bg-white rounded-circle d-inline-block p-1 shadow-sm">
+                    <div class="bg-card rounded-circle d-inline-block p-1 shadow-sm mb-2">
                         <i class="bi bi-person-circle display-1 text-primary"></i>
                     </div>
                 </div>
-                <h3 class="fw-800 mb-1">{{ current_user.nome }}</h3>
+                <h3 class="fw-800 mb-1 text-main">{{ current_user.nome }}</h3>
                 <p class="text-muted mb-3 fw-500">{{ current_user.email }}</p>
                 <span class="badge bg-{{ 'primary' if current_user.is_admin else 'secondary' }}-subtle text-{{ 'primary' if current_user.is_admin else 'secondary' }} border border-{{ 'primary' if current_user.is_admin else 'secondary' }} px-3 py-2 rounded-pill mb-4">
                     {{ 'Administrador do Sistema' if current_user.is_admin else (current_user.cargo if current_user.cargo else 'Colaborador Técnico') }}
@@ -38,11 +38,11 @@
             <div class="card-footer bg-light border-0 p-4">
                 <div class="row text-center">
                     <div class="col-6 border-end">
-                        <h5 class="fw-bold mb-0">{{ equipamentos|length }}</h5>
+                        <h5 class="fw-bold mb-0 text-main">{{ equipamentos|length }}</h5>
                         <small class="text-muted text-uppercase fw-600" style="font-size: 0.65rem;">Ativos</small>
                     </div>
                     <div class="col-6">
-                        <h5 class="fw-bold mb-0">{{ manutencoes|length }}</h5>
+                        <h5 class="fw-bold mb-0 text-main">{{ manutencoes|length }}</h5>
                         <small class="text-muted text-uppercase fw-600" style="font-size: 0.65rem;">Registros</small>
                     </div>
                 </div>
@@ -86,7 +86,7 @@
                                         {% for eq in equipamentos %}
                                         <tr>
                                             <td class="ps-4"><code>{{ eq.codigo }}</code></td>
-                                            <td class="fw-bold">{{ eq.nome }}</td>
+                                            <td class="fw-bold text-main">{{ eq.nome }}</td>
                                             <td>
                                                 <span class="badge bg-{{ eq.get_status_color() }}-subtle text-{{ eq.get_status_color() }} border border-{{ eq.get_status_color() }}">
                                                     {{ eq.get_status_label() }}
@@ -126,8 +126,8 @@
                                     <tbody>
                                         {% for m in manutencoes %}
                                         <tr>
-                                            <td class="ps-4 fw-bold">{{ m.data_manutencao.strftime('%d/%m/%Y') }}</td>
-                                            <td>{{ m.equipamento.nome }}</td>
+                                            <td class="ps-4 fw-bold text-main">{{ m.data_manutencao.strftime('%d/%m/%Y') }}</td>
+                                            <td class="text-main">{{ m.equipamento.nome }}</td>
                                             <td>
                                                 <span class="badge bg-{{ m.get_tipo_color() }}-subtle text-{{ m.get_tipo_color() }} border border-{{ m.get_tipo_color() }}">
                                                     {{ m.get_tipo_label() }}

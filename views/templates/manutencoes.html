@@ -85,7 +85,7 @@
                         <tr>
                             <td class="ps-4 fw-600">{{ m.data_manutencao.strftime('%d/%m/%Y') }}</td>
                             <td>
-                                <div class="fw-bold text-dark">{{ m.equipamento.nome }}</div>
+                                <div class="fw-bold text-main">{{ m.equipamento.nome }}</div>
                                 <div class="small text-muted"><code>{{ m.equipamento.codigo }}</code></div>
                             </td>
                             <td>
@@ -99,7 +99,7 @@
                                 </div>
                             </td>
                             {% if current_user.is_admin %}
-                            <td class="fw-bold text-dark">R$ {{ "%.2f"|format(m.custo) }}</td>
+                            <td class="fw-bold text-main">R$ {{ "%.2f"|format(m.custo) }}</td>
                             {% endif %}
                             <td>{{ m.autor_rel.nome if m.autor_rel else "N/A" }}</td>
                             <td class="text-center pe-4">

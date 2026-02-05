@@ -19,7 +19,7 @@
             <a href="{{ url_for('notificacao.marcar_lida', id=notif.id) }}" 
                class="list-group-item list-group-item-action p-3 border-start border-4 {% if not notif.lida %}border-{{ notif.tipo }} bg-light{% else %}border-transparent opacity-75{% endif %}">
                 <div class="d-flex w-100 justify-content-between align-items-center">
-                    <h6 class="mb-1 fw-bold {% if not notif.lida %}text-dark{% endif %}">
+                    <h6 class="mb-1 fw-bold {% if not notif.lida %}text-main{% endif %}">
                         <i class="bi {% if notif.tipo == 'warning' %}bi-exclamation-triangle{% elif notif.tipo == 'danger' %}bi-x-circle{% elif notif.tipo == 'success' %}bi-check-circle{% else %}bi-info-circle{% endif %} text-{{ notif.tipo }} me-2"></i>
                         {{ notif.titulo }}
                     </h6>

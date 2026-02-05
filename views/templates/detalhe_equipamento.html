@@ -31,7 +31,7 @@
         border-radius: 50%;
         text-align: center;
         line-height: 30px;
-        background: #fff;
+        background: var(--bg-card);
         border: 2px solid #0d6efd;
         color: #0d6efd;
         z-index: 1;
@@ -46,19 +46,19 @@
     }
     .timeline-content {
         padding: 12px;
-        background: #f8f9fa;
+        background: var(--bg-body);
         border-radius: 10px;
-        border: 1px solid #e9ecef;
+        border: 1px solid var(--border-color);
     }
     .timeline-title {
         font-size: 0.85rem;
         font-weight: 700;
         margin-bottom: 3px;
-        color: #212529;
+        color: var(--text-main);
     }
     .timeline-text {
         font-size: 0.8rem;
-        color: #495057;
+        color: var(--text-muted);
         margin-bottom: 0;
     }
     .x-small { font-size: 0.7rem; }
@@ -105,7 +105,7 @@
                 <div class="row g-4">
                     <div class="col-sm-6">
                         <label class="small text-muted text-uppercase fw-600 d-block">Código do Ativo</label>
-                        <span class="fs-5 fw-bold"><code>{{ equipamento.codigo }}</code></span>
+                        <span class="fs-5 fw-bold text-main"><code>{{ equipamento.codigo }}</code></span>
                     </div>
                     <div class="col-sm-6">
                         <label class="small text-muted text-uppercase fw-600 d-block">Status Atual</label>
@@ -124,11 +124,11 @@
                     </div>
                     <div class="col-sm-6">
                         <label class="small text-muted text-uppercase fw-600 d-block">Setor Responsável</label>
-                        <span class="fs-6">{{ equipamento.setor_rel.nome if equipamento.setor_rel else "N/A" }}</span>
+                        <span class="fs-6 text-main">{{ equipamento.setor_rel.nome if equipamento.setor_rel else "N/A" }}</span>
                     </div>
                     <div class="col-sm-6">
                         <label class="small text-muted text-uppercase fw-600 d-block">Técnico Encarregado</label>
-                        <span class="fs-6">{{ equipamento.responsavel_rel.nome if equipamento.responsavel_rel else "N/A" }}</span>
+                        <span class="fs-6 text-main">{{ equipamento.responsavel_rel.nome if equipamento.responsavel_rel else "N/A" }}</span>
                     </div>
                     <div class="col-sm-12">
                         <hr class="opacity-10">
@@ -253,7 +253,7 @@
                                             {{ m.descricao }}
                                         </div>
                                     </td>
-                                    {% if current_user.is_admin %}<td class="fw-bold text-primary small">R$ {{ "%.2f"|format(m.custo) }}</td>{% endif %}
+                                    {% if current_user.is_admin %}<td class="fw-bold text-main small">R$ {{ "%.2f"|format(m.custo) }}</td>{% endif %}
                                     <td class="text-center pe-4">
                                         <a href="{{ url_for('manutencao.detalhe_manutencao', manutencao_id=m.id) }}" 
                                            class="btn btn-sm btn-light border" title="Ver detalhes">
