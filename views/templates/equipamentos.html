@@ -4,19 +4,24 @@
 
 {% block content %}
 <div class="row mb-5 align-items-center animate-fade-in">
-    <div class="col-md-8">
+    <div class="col-md-6">
         <h1 class="display-5 fw-800 text-primary mb-1">
             <i class="bi bi-pc-display me-2"></i> Equipamentos
         </h1>
         <p class="lead text-muted">Gerencie o inventário e a disponibilidade dos ativos.</p>
     </div>
-    {% if current_user.is_authenticated and current_user.is_admin %}
-    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <!-- Botão de Exportar Adicionado AQUI -->
+        <a href="{{ url_for('equipamento.exportar_equipamentos') }}" class="btn btn-outline-success btn-lg rounded-pill px-4 shadow-sm me-2">
+            <i class="bi bi-file-earmark-excel me-2"></i> Exportar
+        </a>
+
+        {% if current_user.is_authenticated and current_user.is_admin %}
         <a href="{{ url_for('equipamento.novo_equipamento') }}" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm">
             <i class="bi bi-plus-circle me-2"></i> Novo Equipamento
         </a>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 
 <div class="card border-0 shadow-sm animate-fade-in">

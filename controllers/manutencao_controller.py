@@ -1,14 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, make_response
 from flask_login import login_required, current_user
 from models.manutencao import Manutencao
 from models.equipamento import Equipamento
 from models.database import db
 from datetime import datetime
+import csv
+import io
 
 # Blueprint para rotas de manutenções
 manutencao_bp = Blueprint('manutencao', __name__)
 
 @manutencao_bp.route('/manutencoes')
+@login_required
 def listar_manutencoes():
     """
     Lista manutenções com filtro de data (União Main + Branch)
@@ -44,6 +47,65 @@ def listar_manutencoes():
                          data_inicio=data_inicio_str,
                          data_fim=data_fim_str,
                          filtro_pre=filtro_pre)
+
+@manutencao_bp.route('/manutencoes/exportar')
+@login_required
+def exportar_manutencoes():
+    """
+    Exporta o relatório de manutenções em CSV (Excel)
+    """
+    # Mesma lógica de filtro da listagem
+    data_inicio_str = request.args.get('data_inicio')
+    data_fim_str = request.args.get('data_fim')
+    
+    data_inicio = None
+    data_fim = None
+    
+    if data_inicio_str:
+        try: data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
+        except ValueError: pass
+    if data_fim_str:
+        try: data_fim = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
+        except ValueError: pass
+    
+    if data_inicio or data_fim:
+        manutencoes = Manutencao.get_filtered(data_inicio, data_fim)
+    else:
+        manutencoes = Manutencao.get_all()
+
+    # Prepara o CSV
+    si = io.StringIO()
+    cw = csv.writer(si, delimiter=';')
+    
+    # Define cabeçalho baseado na tabela HTML
+    headers = ['Data', 'Equipamento', 'Código', 'Tipo', 'Descrição', 'Responsável']
+    if current_user.is_admin:
+        headers.insert(5, 'Custo (R$)') # Adiciona Custo apenas se for admin
+        
+    cw.writerow(headers)
+    
+    for m in manutencoes:
+        data_fmt = m.data_manutencao.strftime('%d/%m/%Y')
+        equipamento_nome = m.equipamento.nome
+        equipamento_cod = m.equipamento.codigo
+        tipo_label = m.get_tipo_label()
+        descricao = m.descricao.replace('\n', ' ') if m.descricao else ''
+        responsavel = m.autor_rel.nome if m.autor_rel else "N/A"
+        
+        row = [data_fmt, equipamento_nome, equipamento_cod, tipo_label, descricao]
+        
+        if current_user.is_admin:
+            custo_fmt = f"{m.custo:.2f}".replace('.', ',')
+            row.append(custo_fmt)
+            
+        row.append(responsavel)
+        
+        cw.writerow(row)
+        
+    output = make_response(si.getvalue().encode('utf-8-sig'))
+    output.headers["Content-Disposition"] = f"attachment; filename=relatorio_manutencoes_{datetime.now().strftime('%Y%m%d')}.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 @manutencao_bp.route('/manutencoes/nova', methods=['GET', 'POST'])
 @login_required

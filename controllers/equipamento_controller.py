@@ -1,10 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, make_response
 from flask_login import login_required, current_user
 from models.equipamento import Equipamento
 from models.manutencao import Manutencao
 from models.setor import Setor
 from models.funcionario import Funcionario
 from models.database import db
+from datetime import datetime
+import csv
+import io
 
 # Blueprint para rotas de equipamentos
 equipamento_bp = Blueprint('equipamento', __name__)
@@ -14,6 +17,43 @@ def listar_equipamentos():
     """Lista todos os equipamentos"""
     equipamentos = Equipamento.get_all()
     return render_template('equipamentos.html', equipamentos=equipamentos)
+
+@equipamento_bp.route('/equipamentos/exportar')
+@login_required
+def exportar_equipamentos():
+    """
+    Exporta o inventário de equipamentos em CSV (Excel)
+    """
+    equipamentos = Equipamento.get_all()
+
+    # Prepara o arquivo na memória
+    si = io.StringIO()
+    cw = csv.writer(si, delimiter=';')
+    
+    # Cabeçalho baseado ESTRITAMENTE nas colunas da sua tabela HTML
+    cw.writerow(['Código', 'Nome do Equipamento', 'Setor', 'Responsável', 'Status', 'Qtd. Manutenções'])
+    
+    for eq in equipamentos:
+        # Extrai os dados garantindo que não quebre se for nulo
+        setor = eq.setor_rel.nome if hasattr(eq, 'setor_rel') and eq.setor_rel else "N/A"
+        responsavel = eq.responsavel_rel.nome if hasattr(eq, 'responsavel_rel') and eq.responsavel_rel else "N/A"
+        # Conta manutenções se a relação existir
+        qtd_manutencoes = len(eq.manutencoes) if hasattr(eq, 'manutencoes') else 0
+        
+        cw.writerow([
+            eq.codigo,
+            eq.nome,
+            setor,
+            responsavel,
+            eq.status.upper() if eq.status else 'N/A',
+            qtd_manutencoes
+        ])
+        
+    # Gera a resposta para download
+    output = make_response(si.getvalue().encode('utf-8-sig'))
+    output.headers["Content-Disposition"] = f"attachment; filename=inventario_equipamentos_{datetime.now().strftime('%Y%m%d')}.csv"
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 @equipamento_bp.route('/equipamentos/novo', methods=['GET', 'POST'])
 @login_required
@@ -71,9 +111,9 @@ def detalhe_equipamento(equipamento_id):
     custo_total = Manutencao.get_custo_por_equipamento(equipamento_id)
     
     return render_template('detalhe_equipamento.html', 
-                         equipamento=equipamento, 
-                         manutencoes=manutencoes,
-                         custo_total=custo_total)
+                           equipamento=equipamento, 
+                           manutencoes=manutencoes,
+                           custo_total=custo_total)
 
 @equipamento_bp.route('/equipamentos/<int:equipamento_id>/editar', methods=['GET', 'POST'])
 @login_required
