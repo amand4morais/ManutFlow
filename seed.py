@@ -2,6 +2,7 @@ from app import app
 from models.database import db
 from models.funcionario import Funcionario
 from models.setor import Setor
+from datetime import datetime
 
 def seed():
     with app.app_context():
@@ -25,6 +26,7 @@ def seed():
                 email="admin123@aguia.com",
                 senha="admin123", # Em produção, use hash!
                 is_admin=True,
+                data_criacao=datetime.strptime("02/02/2026", "%d/%m/%Y"),
                 setor_id=setor_admin.id # Associando o admin ao setor criado
             )
             admin.save()

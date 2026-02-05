@@ -1,5 +1,6 @@
 from models.database import db
 from flask_login import UserMixin
+from datetime import datetime
 
 class Funcionario(db.Model, UserMixin):
     __tablename__ = 'funcionarios'
@@ -10,6 +11,7 @@ class Funcionario(db.Model, UserMixin):
     senha = db.Column(db.String(200), nullable=False)
     cargo = db.Column(db.String(100), nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
+    data_criacao = db.Column(db.DateTime, default=datetime.now)
     setor_id = db.Column(db.Integer, db.ForeignKey('setores.id'), nullable=True)
     
     # Relacionamento: Um funcionário é responsável por muitos equipamentos
