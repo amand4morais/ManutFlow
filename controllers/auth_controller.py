@@ -50,12 +50,18 @@ def cadastro():
     if request.method == 'POST':
         nome = request.form.get('username')
         email = request.form.get('email')
+        cargo = request.form.get('cargo')
         senha = request.form.get('password')
         setor_id = request.form.get('setor_id')
 
         # Validações básicas
-        if not all([nome, email, senha, setor_id]):
-            flash('Preencha todos os campos.', 'danger')
+        if not all([nome, email, cargo, senha, setor_id]):
+            flash('Preencha todos os campos obrigatórios.', 'danger')
+            return redirect(url_for('auth.cadastro'))
+
+        # Validação de formato de e-mail
+        if '@' not in email or '.' not in email:
+            flash('Por favor, insira um e-mail corporativo válido.', 'danger')
             return redirect(url_for('auth.cadastro'))
 
         user_exists = Funcionario.query.filter_by(email=email).first()
@@ -67,6 +73,7 @@ def cadastro():
         new_user = Funcionario(
             nome=nome,
             email=email,
+            cargo=cargo,
             senha=senha,
             setor_id=setor_id,
             is_admin=False
@@ -126,6 +133,7 @@ def perfil():
 def configuracoes():
     if request.method == 'POST':
         nome = request.form.get('nome')
+        cargo = request.form.get('cargo')
         nova_senha = request.form.get('nova_senha')
         confirmar_senha = request.form.get('confirmar_senha')
 
@@ -134,6 +142,8 @@ def configuracoes():
             return redirect(url_for('auth.configuracoes'))
 
         current_user.nome = nome
+        if not current_user.is_admin and cargo:
+            current_user.cargo = cargo
 
         if nova_senha:
             if nova_senha != confirmar_senha:

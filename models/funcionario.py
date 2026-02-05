@@ -8,6 +8,7 @@ class Funcionario(db.Model, UserMixin):
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     senha = db.Column(db.String(200), nullable=False)
+    cargo = db.Column(db.String(100), nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
     setor_id = db.Column(db.Integer, db.ForeignKey('setores.id'), nullable=True)
     

@@ -38,13 +38,29 @@
                 <p class="text-muted">Preencha os dados abaixo para criar seu perfil</p>
             </div>
 
-            <form method="POST" action="{{ url_for('auth.cadastro') }}" class="needs-validation" novalidate>
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show border-0 shadow-sm mb-4 animate-fade-in" role="alert" style="border-radius: 12px; font-size: 0.9rem;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi {% if category == 'success' %}bi-check-circle-fill{% elif category == 'danger' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %} me-2"></i>
+                                <div>{{ message }}</div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.cadastro') }}" class="needs-validation" novalidate id="cadastroForm">
                 <div class="auth-input-group mb-3">
                     <label class="form-label fw-600 small text-muted text-uppercase">Nome Completo</label>
                     <div class="position-relative d-flex align-items-center">
                         <input type="text" name="username" class="auth-input" placeholder="Seu nome" required>
                         <i class="bi bi-person auth-icon"></i>
                     </div>
+                    <div class="invalid-feedback small fw-600">O nome é obrigatório.</div>
                 </div>
 
                 <div class="auth-input-group mb-3">
@@ -53,14 +69,25 @@
                         <input type="email" name="email" class="auth-input" placeholder="nome@empresa.com" required>
                         <i class="bi bi-envelope auth-icon"></i>
                     </div>
+                    <div class="invalid-feedback small fw-600">Insira um e-mail corporativo válido.</div>
+                </div>
+
+                <div class="auth-input-group mb-3">
+                    <label class="form-label fw-600 small text-muted text-uppercase">Cargo / Função</label>
+                    <div class="position-relative d-flex align-items-center">
+                        <input type="text" name="cargo" class="auth-input" placeholder="Ex: Técnico de Manutenção" required>
+                        <i class="bi bi-briefcase auth-icon"></i>
+                    </div>
+                    <div class="invalid-feedback small fw-600">O cargo é obrigatório.</div>
                 </div>
 
                 <div class="auth-input-group mb-3">
                     <label class="form-label fw-600 small text-muted text-uppercase">Senha</label>
                     <div class="position-relative d-flex align-items-center">
-                        <input type="password" name="password" id="password" class="auth-input" placeholder="••••••••" required>
+                        <input type="password" name="password" id="password" class="auth-input" placeholder="••••••••" required minlength="6">
                         <i class="bi bi-eye-slash auth-icon cursor-pointer" onclick="togglePassword('password', this)"></i>
                     </div>
+                    <div class="invalid-feedback small fw-600">A senha deve ter pelo menos 6 caracteres.</div>
                 </div>
 
                 <div class="auth-input-group mb-4">
@@ -74,6 +101,7 @@
                         </select>
                         <i class="bi bi-building auth-icon"></i>
                     </div>
+                    <div class="invalid-feedback small fw-600">Selecione um setor.</div>
                 </div>
 
                 <button type="submit" class="btn btn-auth shadow-sm">
@@ -97,5 +125,31 @@
         background-color: #1e293b;
         color: white;
     }
+    .was-validated .auth-input:invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + .75rem);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(.375em + .1875rem) center;
+        background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+    }
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+        margin-top: 0.25rem;
+    }
+    .was-validated .auth-input:invalid ~ .invalid-feedback {
+        display: block;
+    }
 </style>
+
+<script>
+    document.getElementById('cadastroForm').addEventListener('submit', function(event) {
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        this.classList.add('was-validated');
+    }, false);
+</script>
 {% endblock %}

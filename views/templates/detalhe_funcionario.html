@@ -39,6 +39,12 @@
                     <label class="text-muted small fw-600 text-uppercase d-block mb-1">E-mail Corporativo</label>
                     <span class="text-primary fw-500">{{ funcionario.email }}</span>
                 </div>
+                {% if not funcionario.is_admin %}
+                <div class="mb-4">
+                    <label class="text-muted small fw-600 text-uppercase d-block mb-1">Cargo / Função</label>
+                    <span class="text-dark fw-500">{{ funcionario.cargo if funcionario.cargo else 'Não informado' }}</span>
+                </div>
+                {% endif %}
                 <div class="row g-3">
                     <div class="col-6">
                         <label class="text-muted small fw-600 text-uppercase d-block mb-1">Nível de Acesso</label>
